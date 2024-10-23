@@ -25,7 +25,7 @@ class AfpnTest(seldom.TestCase):
         登录
         """
         print(f"{BaseUrl}/login")
-        self.open(f"{BaseUrl}/login")
+        # self.open(f"{BaseUrl}/login")
         s = Steps().open(f"{BaseUrl}/login")
         
         
@@ -1036,7 +1036,7 @@ class AfpnTest(seldom.TestCase):
 
 if __name__ == '__main__':
     seldom.main(
-                case='test_apfn_1.AfpnTest.test_Afpn_0_1',
+                case='test_apfn_1.AfpnTest',
                 browser="gc", 
                 # browser="firefox",
                 tester="tzk",
