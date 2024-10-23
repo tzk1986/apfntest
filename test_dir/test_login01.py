@@ -6,7 +6,7 @@ from PIL import Image
 from io import BytesIO
 
 import pytesseract, cv2
-
+import numpy as np
 
 
 def save_base64_image(base64_str, save_path):
@@ -109,21 +109,41 @@ class AfpnTest(seldom.TestCase):
 
         image = cv2.imread('pic/captcha.png')
 
+        # 转换为HSV颜色空间
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+        # 定义蓝色的HSV范围
+        lower_blue = np.array([100, 50, 50])
+        upper_blue = np.array([130, 255, 255])
+
+        # 创建掩码
+        mask = cv2.inRange(hsv, lower_blue, upper_blue)
+
+        # 应用掩码
+        result = cv2.bitwise_and(image, image, mask=mask)
+        cv2.imwrite("pic/captcha_result.png", result)
+
         # 转换为灰度图像
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+        cv2.imwrite("pic/captcha_gray.png", gray)
 
         # 二值化处理
-        _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+        _, binary1 = cv2.threshold(result, 100, 255, cv2.THRESH_BINARY)
+        cv2.imwrite("pic/captcha_binary100.png", binary1)
+        _, binary2 = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
+        cv2.imwrite("pic/captcha_binary127.png", binary2)
+        _, binary3 = cv2.threshold(result, 150, 255, cv2.THRESH_BINARY)
+        cv2.imwrite("pic/captcha_binary150.png", binary3)
 
         # 去除干扰线（如果有）
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-        eroded = cv2.erode(binary, kernel, iterations=1)
+        eroded = cv2.erode(binary1, kernel, iterations=1)
         cleaned = cv2.dilate(eroded, kernel, iterations=1)
         cv2.imwrite("pic/cleaned_captcha_cleaned.png", cleaned)
 
         # 使用Tesseract进行识别，指定只识别数字
         custom_config = r'--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789'
-        captcha_text = pytesseract.image_to_string(cleaned, lang='eng', config=custom_config)
+        captcha_text = pytesseract.image_to_string(binary1, lang='eng', config=custom_config)
 
         print(f"Captcha text: {captcha_text}")
 
