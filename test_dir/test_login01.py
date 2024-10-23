@@ -101,13 +101,13 @@ class AfpnTest(seldom.TestCase):
         # print(base64_str)
 
         # 下载验证码图片并保存到本地
-        captcha_image = save_base64_image(base64_str, save_path="test_dir/captcha.png")
+        captcha_image = save_base64_image(base64_str, save_path="pic/captcha.png")
 
         # 识别验证码图片中的文本
-        # captcha_text = recognize_captcha('test_dir/captcha.png')
+        # captcha_text = recognize_captcha('pic/captcha.png')
         # print(f"Captcha text: {captcha_text}")
 
-        image = cv2.imread('test_dir/captcha.png')
+        image = cv2.imread('pic/captcha.png')
 
         # 转换为灰度图像
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -119,20 +119,18 @@ class AfpnTest(seldom.TestCase):
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         eroded = cv2.erode(binary, kernel, iterations=1)
         cleaned = cv2.dilate(eroded, kernel, iterations=1)
+        cv2.imwrite("pic/cleaned_captcha_cleaned.png", cleaned)
 
         # 使用Tesseract进行识别，指定只识别数字
         custom_config = r'--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789'
         captcha_text = pytesseract.image_to_string(cleaned, lang='eng', config=custom_config)
 
         print(f"Captcha text: {captcha_text}")
-        # 测试一下
-        print("测试一下")
 
         # 输入验证码文本
         s.find('#app > div > form > div:nth-child(4) > div > div > div.login-input-code.el-input.el-input--prefix > input').type(captcha_text)
-        
+        s.sleep(1)
         s.find('#app > div > form > div:nth-child(5) > div > button').click()
-
 
         s.sleep(1)
         self.get_cookies()
