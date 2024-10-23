@@ -125,6 +125,8 @@ class AfpnTest(seldom.TestCase):
         captcha_text = pytesseract.image_to_string(cleaned, lang='eng', config=custom_config)
 
         print(f"Captcha text: {captcha_text}")
+        # 测试一下
+        print("测试一下")
 
         # 输入验证码文本
         s.find('#app > div > form > div:nth-child(4) > div > div > div.login-input-code.el-input.el-input--prefix > input').type(captcha_text)
