@@ -25,7 +25,6 @@ class AfpnTest(seldom.TestCase):
         登录
         """
         print(f"{BaseUrl}/login")
-        # self.open(f"{BaseUrl}/login")
         s = Steps().open(f"{BaseUrl}/login")
         
         
