@@ -20,36 +20,38 @@ def save_base64_image(base64_str, save_path):
     image.save(save_path)
     print(f"Image saved as {save_path}")
 
+def save_to_txt(text, file_path):
+    with open(file_path, 'w') as file:
+        file.write(text)
 
+def recognize_captcha(image_path):
+    # 打开图片
+    image = Image.open(image_path)
 
-# def recognize_captcha(image_path):
-#     # 打开图片
-#     image = Image.open(image_path)
+    # 将图像转换为灰度图像
+    image = image.convert('L')
 
-#     # 将图像转换为灰度图像
-#     image = image.convert('L')
-
-#     # 对图像进行二值化处理
-#     threshold = 127
-#     table = []
-#     for i in range(256):
-#         if i < threshold:
-#             table.append(0)
-#         else:
-#             table.append(1)
-#     image = image.point(table, '1')
+    # 对图像进行二值化处理
+    threshold = 127
+    table = []
+    for i in range(256):
+        if i < threshold:
+            table.append(0)
+        else:
+            table.append(1)
+    image = image.point(table, '1')
 
     
 
 
     
-#     # 使用pytesseract识别图片中的文本
-#     text = pytesseract.image_to_string(image, lang='eng', config='--psm 7 --oem 3 -c tessedit_char_whitelist=0123456789')
+    # 使用pytesseract识别图片中的文本
+    text = pytesseract.image_to_string(image, lang='eng', config='--psm 7 --oem 3 -c tessedit_char_whitelist=0123456789')
     
-#     # 过滤非数字字符，只保留数字
-#     digits = ''.join(filter(str.isdigit, text))
+    # 过滤非数字字符，只保留数字
+    digits = ''.join(filter(str.isdigit, text))
     
-#     return digits
+    return digits
 
 
 def download_image(url, save_path):
@@ -99,6 +101,8 @@ class AfpnTest(seldom.TestCase):
         # 获取图片的base64编码信息
         base64_str = captcha_url.split(",")[1]
         # print(base64_str)
+        save_to_txt(base64_str, file_path="pic/captcha_base64.txt")
+
 
         # 下载验证码图片并保存到本地
         captcha_image = save_base64_image(base64_str, save_path="pic/captcha.png")
@@ -128,22 +132,22 @@ class AfpnTest(seldom.TestCase):
         cv2.imwrite("pic/captcha_gray.png", gray)
 
         # 二值化处理
-        _, binary1 = cv2.threshold(result, 100, 255, cv2.THRESH_BINARY)
+        _, binary1 = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
         cv2.imwrite("pic/captcha_binary100.png", binary1)
-        _, binary2 = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
+        _, binary2 = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
         cv2.imwrite("pic/captcha_binary127.png", binary2)
-        _, binary3 = cv2.threshold(result, 150, 255, cv2.THRESH_BINARY)
+        _, binary3 = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
         cv2.imwrite("pic/captcha_binary150.png", binary3)
 
         # 去除干扰线（如果有）
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 1))
         eroded = cv2.erode(binary1, kernel, iterations=1)
         cleaned = cv2.dilate(eroded, kernel, iterations=1)
         cv2.imwrite("pic/cleaned_captcha_cleaned.png", cleaned)
 
         # 使用Tesseract进行识别，指定只识别数字
         custom_config = r'--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789'
-        captcha_text = pytesseract.image_to_string(binary1, lang='eng', config=custom_config)
+        captcha_text = pytesseract.image_to_string(image, lang='eng', config=custom_config)
 
         print(f"Captcha text: {captcha_text}")
 

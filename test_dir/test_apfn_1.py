@@ -90,7 +90,7 @@ class AfpnTest(seldom.TestCase):
         s = Steps().open(f"{BaseUrl}/vip/platformVip")
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(1) > div > input')
         s.type("15900506254")
-        self.assertText("微信用户")
+        self.assertText("测试tzk")
 
 
     def test_Afpn_4_2(self):
@@ -191,7 +191,7 @@ class AfpnTest(seldom.TestCase):
         s.type("上海艾佩菲宁")
 
         # 商户名称选择上海艾佩菲宁搜索
-        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(126)').click()
+        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(2) > div > div > input').click()
         s.sleep(1)
@@ -373,7 +373,7 @@ class AfpnTest(seldom.TestCase):
         # 档口名称选择 美食美客
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div.search_option_left.s-gap-6-15 > div:nth-child(3) > div > div > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(254)').click()
+        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
 
     def test_Afpn_6_8(self):
@@ -472,7 +472,7 @@ class AfpnTest(seldom.TestCase):
         # 商户名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div.search_option_left.s-gap-6-15 > div:nth-child(2) > div > div > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(126)').click()
+        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 档口名称 美食美克
         # s.refresh() # 为了能够不使用相同的css定位，刷新页面，直接获取定位值
@@ -480,7 +480,7 @@ class AfpnTest(seldom.TestCase):
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div.search_option_left.s-gap-6-15 > div:nth-child(3) > div > div > input').click()
         s.sleep(1)
         # 定位不到
-        s.find('body > div:nth-child(7) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(18)').click()
+        s.find('body > div:nth-child(7) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 绑盘方式 刷卡
         # s.refresh() # 为了能够不使用相同的css定位，刷新页面，直接获取定位值
@@ -509,7 +509,7 @@ class AfpnTest(seldom.TestCase):
         # 选择商户名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div:nth-child(4) > div > div.el-dialog__body > div > div > form > div:nth-child(1) > div > div > div.el-input.el-input--suffix > input').click()
         s.sleep(1)
-        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(126)').click()
+        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 托盘起始编号
         s.find('#app > section > section > section > main > section > section > main > div.main > div:nth-child(4) > div > div.el-dialog__body > div > div > form > div:nth-child(2) > div > div > input')
@@ -527,12 +527,12 @@ class AfpnTest(seldom.TestCase):
         # 选择商户名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div:nth-child(5) > div > div.el-dialog__body > div > div > form > div:nth-child(1) > div > div > div > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(7) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(126)').click()
+        s.find('body > div:nth-child(7) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 选择档口
         s.find('#app > section > section > section > main > section > section > main > div.main > div:nth-child(5) > div > div.el-dialog__body > div > div > form > div:nth-child(2) > div > div > div > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(8) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(18)').click()
+        s.find('body > div:nth-child(8) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 托盘起始编号
         s.find('#app > section > section > section > main > section > section > main > div.main > div:nth-child(5) > div > div.el-dialog__body > div > div > form > div:nth-child(3) > div > div > input')
@@ -568,12 +568,12 @@ class AfpnTest(seldom.TestCase):
         # 商户名称搜索
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(2) > div > div.el-input.el-input--suffix > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(126)').click()
+        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 档口查询
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(3) > div > div.el-input.el-input--suffix > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(7) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(18)').click()
+        s.find('body > div:nth-child(7) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
 
     def test_Afpn_8_3(self):
@@ -622,12 +622,12 @@ class AfpnTest(seldom.TestCase):
         # 商户选择
         s.find('#app > section > section > section > main > section > section > main > div.main > div:nth-child(4) > div > div.el-dialog__body > div > div > form > div:nth-child(1) > div > div > div > input').click()
         s.sleep(1)
-        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(126)').click()
+        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 选择档口
         s.find('#app > section > section > section > main > section > section > main > div.main > div:nth-child(4) > div > div.el-dialog__body > div > div > form > div:nth-child(2) > div > div > div > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(7) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(18)').click()
+        s.find('body > div:nth-child(7) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 输入机器名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div:nth-child(4) > div > div.el-dialog__body > div > div > form > div:nth-child(3) > div > div > input')
@@ -662,12 +662,12 @@ class AfpnTest(seldom.TestCase):
         # 商户名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div.search_option_left.s-gap-6-15 > div:nth-child(2) > div > div > input').click()
         s.sleep(1)
-        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(126)').click()
+        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 档口名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div.search_option_left.s-gap-6-15 > div:nth-child(3) > div > div > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(18)').click()
+        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
 
     def test_Afpn_8_5(self):
@@ -938,12 +938,12 @@ class AfpnTest(seldom.TestCase):
         # 商户名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(2) > div > div > input').click()
         s.sleep(1)
-        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(126)').click()
+        s.find('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 档口名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(3) > div > div > input').click()
         s.sleep(1)
-        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(18)').click()
+        s.find('body > div:nth-child(6) > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:last-child').click()
         s.sleep(1)
         # 计价方式
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(5) > div > div > input').click()
@@ -1039,7 +1039,7 @@ if __name__ == '__main__':
                 browser="gc", 
                 # browser="firefox",
                 tester="tzk",
-                debug=True
+                # debug=True
                 )
 
 
