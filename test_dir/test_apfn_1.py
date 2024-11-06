@@ -1039,6 +1039,7 @@ if __name__ == '__main__':
                 browser="gc", 
                 # browser="firefox",
                 tester="tzk",
+                description="数字餐厅管理端",
                 # debug=True
                 )
 
