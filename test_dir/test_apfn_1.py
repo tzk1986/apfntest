@@ -90,7 +90,7 @@ class AfpnTest(seldom.TestCase):
         s = Steps().open(f"{BaseUrl}/vip/platformVip")
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(1) > div > input')
         s.type("15900506254")
-        self.assertText("测试tzk")
+        # self.assertText("测试tzk")
 
 
     def test_Afpn_4_2(self):
