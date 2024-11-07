@@ -91,8 +91,34 @@ class AfpnTest(seldom.TestCase):
         # 选择食材分类
         s.find("#form_item_categoryId").click()
         s.sleep(1)
-        # 选择食材分类中的第一个选项
-        s.find(" ").click()
+        # 选择食材分类中的第一个选项  使用debugger方式 查看选中的元素
+        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div > div > div.ant-row.css-12kx9o0 > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div > div > div.ant-select-tree-list > div.ant-select-tree-list-holder > div > div > div:nth-child(6) > span.ant-select-tree-switcher.ant-select-tree-switcher_close > span").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div > div > div.ant-row.css-12kx9o0 > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div > div > div.ant-select-tree-list > div.ant-select-tree-list-holder > div > div > div:nth-child(9)").click()
+        s.sleep(1)
+        # 选择食材类型 主料
+        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div > div > div.ant-row.css-12kx9o0 > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div > div > div.ant-row.css-12kx9o0 > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+        s.sleep(1)
+        # 输入标准净菜率
+        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div > div > div.ant-row.css-12kx9o0 > div:nth-child(6) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div > div > div.ant-input-number.ant-input-number-in-form-item.scat-input-number_XsjRs88q.scat-input-number-hide-addon-after_hFd-cJUG.css-12kx9o0 > div > input").type("98.5")
+        s.sleep(1)
+        # 输入备注
+        s.find("#form_item_remark").type("测试备注")
+        s.sleep(1)
+        # 点击保存按钮
+        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.scat-fixed-filter_xxtavGtw > div.s-nowrap.s-flex-nowrap > button.css-12kx9o0.ant-btn.ant-btn-primary.scat-button_gxH2v2M8 > span").click()
+        s.sleep(1)
+        self.assertText("添加成功")
+        # 点击删除按钮，并二次确定删除
+        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div:nth-child(2) > div > div > div > div > div > div > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-right.ant-table-cell-fix-right-first > button.css-12kx9o0.ant-btn.ant-btn-link.ant-btn-dangerous > span").click()
+        s.sleep(1)
+        s.find("body > div:nth-child(6) > div > div > div > div.ant-popover-inner > div > div > div.ant-popconfirm-buttons > button.css-12kx9o0.ant-btn.ant-btn-primary.ant-btn-sm.ant-btn-dangerous > span").click()
+        s.sleep(1)
+        self.assertText("删除成功")
+
+
 
 
         pass
