@@ -149,83 +149,121 @@ class AfpnTest(seldom.TestCase):
     #     self.assertText("删除成功")
 
 
-    def test_Afpn_2_2(self):
+    # def test_Afpn_2_2(self):
+    #     """
+    #     菜谱管理-菜谱列表
+    #     """
+    #     s = Steps().open(f"{BaseUrl}/recipeManage/list")
+    #     s.sleep(1)
+    #     # 选择类型 自研
+    #     s.find("#rc_select_1").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     s.sleep(1)
+    #     # 选择排餐大类 第一个
+    #     s.find("#rc_select_2").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     # s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div > div:contains('川菜')").click()
+    #     s.sleep(1)
+    #     # 选择排餐小类 第一个
+    #     s.find("#rc_select_3").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(6) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     # s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(6) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div[text='麻辣']").click()
+    #     s.sleep(1)
+    #     # 点击新增菜谱
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div.ant-col.ant-col-xs-24.ant-col-sm-24.ant-col-md-12.ant-col-lg-16.ant-col-xl-16.ant-col-xxl-6.scat-search-col_WKLC9-JI.css-12kx9o0 > div > div > div > div > div > button:nth-child(2)").click()
+    #     s.sleep(1)
+    #     # 刷新页面 确保后面的元素标值位正确计算
+    #     s.refresh()
+    #     # 输入菜谱编码
+    #     s.find("#form_item_code").type("ceshitzk123")
+    #     # 输入菜谱名称
+    #     s.find("#form_item_name").type("测试菜谱tzk")
+    #     # 选择菜谱分类
+    #     s.find("#form_item_categoryId").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(1) > div > div.ant-row.css-12kx9o0 > div:nth-child(3) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div > div > div.ant-select-tree-list > div.ant-select-tree-list-holder > div > div > div:nth-child(2)").click()
+    #     # 选择使用范围
+    #     s.find("#rc_select_1").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(1) > div > div.ant-row.css-12kx9o0 > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     # 输入备注
+    #     s.find("#form_item_remark").type("测试备注")
+    #     # 选择排餐大类
+    #     s.find("#rc_select_2").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(2) > div > div:nth-child(2) > div:nth-child(1) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     # 选择排餐小类
+    #     s.find("#rc_select_3").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(2) > div > div:nth-child(2) > div:nth-child(2) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     # 添加标签
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(2) > div > div:nth-child(3) > div > div > div > div.ant-col.ant-form-item-label.css-12kx9o0 > label > span > div > span > div").click()
+    #     s.sleep(1)
+    #     s.find("body > div:nth-child(6) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     # 点击保存
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.scat-fixed-filter_xxtavGtw > div.s-nowrap.s-flex-nowrap > button.css-12kx9o0.ant-btn.ant-btn-primary.scat-button_gxH2v2M8").click()
+    #     s.sleep(1)
+    #     self.assertText("添加成功")
+    #     # 删除
+    #     s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > div > div > div > div > div > div > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-right.ant-table-cell-fix-right-first > button.css-12kx9o0.ant-btn.ant-btn-link.ant-btn-dangerous > span").click()
+    #     s.sleep(1)
+    #     s.find("body > div:nth-child(6) > div > div > div > div.ant-popover-inner > div > div > div.ant-popconfirm-buttons > button.css-12kx9o0.ant-btn.ant-btn-primary.ant-btn-sm.ant-btn-dangerous > span").click()
+    #     s.sleep(1)
+    #     self.assertText("删除成功")
+
+
+    def test_Afpn_2_3(self):
         """
-        菜谱管理-菜谱列表
+        菜谱管理-排餐配置
         """
-        s = Steps().open(f"{BaseUrl}/recipeManage/list")
+        s = Steps().open(f"{BaseUrl}/recipeManage/arrange")
+        s.sleep(2)
+        # 新增排餐分类
+        s.find("#rc-tabs-0-panel-category > div > div > form > div > div:nth-child(2) > div > div > div > div > div > button:nth-child(2)").click()
         s.sleep(1)
-        # 选择类型 自研
-        s.find("#rc_select_1").click()
-        s.sleep(1)
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
-        s.sleep(1)
-        # 选择排餐大类 第一个
-        s.find("#rc_select_2").click()
-        s.sleep(1)
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
-        # s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div > div:contains('川菜')").click()
-        s.sleep(1)
-        # 选择排餐小类 第一个
-        s.find("#rc_select_3").click()
-        s.sleep(1)
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(6) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
-        # s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div:nth-child(6) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div[text='麻辣']").click()
-        s.sleep(1)
-        # 点击新增菜谱
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div > div.scat-card_zy63xRVm.content > form > div > div.ant-col.ant-col-xs-24.ant-col-sm-24.ant-col-md-12.ant-col-lg-16.ant-col-xl-16.ant-col-xxl-6.scat-search-col_WKLC9-JI.css-12kx9o0 > div > div > div > div > div > button:nth-child(2)").click()
-        s.sleep(1)
-        # 刷新页面 确保后面的元素标值位正确计算
-        s.refresh()
-        # 输入菜谱编码
-        s.find("#form_item_code").type("ceshitzk123")
-        # 输入菜谱名称
-        s.find("#form_item_name").type("测试菜谱tzk")
-        # 选择菜谱分类
-        s.find("#form_item_categoryId").click()
-        s.sleep(1)
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(1) > div > div.ant-row.css-12kx9o0 > div:nth-child(3) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div > div > div.ant-select-tree-list > div.ant-select-tree-list-holder > div > div > div:nth-child(2)").click()
-        # 选择使用范围
-        s.find("#rc_select_1").click()
-        s.sleep(1)
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(1) > div > div.ant-row.css-12kx9o0 > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
-        # 输入备注
-        s.find("#form_item_remark").type("测试备注")
-        # 选择排餐大类
-        s.find("#rc_select_2").click()
-        s.sleep(1)
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(2) > div > div:nth-child(2) > div:nth-child(1) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
-        # 选择排餐小类
-        s.find("#rc_select_3").click()
-        s.sleep(1)
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(2) > div > div:nth-child(2) > div:nth-child(2) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
-        # 添加标签
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.content > div > div > form > div:nth-child(2) > div > div:nth-child(3) > div > div > div > div.ant-col.ant-form-item-label.css-12kx9o0 > label > span > div > span > div").click()
-        s.sleep(1)
-        s.find("body > div:nth-child(6) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+        # 输入分类名称
+        s.find("#form_item_name").type("测试分类")
         # 点击保存
-        s.find("#app > section > section > main > div.scat-basic-layout-router-view_oRIA-eH6 > div.scat-fixed-filter_xxtavGtw > div.s-nowrap.s-flex-nowrap > button.css-12kx9o0.ant-btn.ant-btn-primary.scat-button_gxH2v2M8").click()
+        s.find("body > div:nth-child(5) > div > div.ant-modal-wrap > div > div.ant-modal-content > div.ant-modal-footer > button.css-12kx9o0.ant-btn.ant-btn-primary > span").click()
         s.sleep(1)
         self.assertText("添加成功")
+        # 输入名称搜索
+        s.find("#rc-tabs-0-panel-category > div > div > form > div > div:nth-child(1) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > span > input").type("测试分类")
+        s.sleep(1)
+        # 删除
+        s.find("#rc-tabs-0-panel-category > div > div > div > div > div > div > div > div > table > tbody > tr.ant-table-row.ant-table-row-level-0 > td.ant-table-cell.ant-table-cell-fix-right.ant-table-cell-fix-right-first > button.css-12kx9o0.ant-btn.ant-btn-link.ant-btn-dangerous > span").click()
+        s.sleep(1)
+        s.find("body > div:nth-child(6) > div > div > div > div.ant-popover-inner > div > div > div.ant-popconfirm-buttons > button.css-12kx9o0.ant-btn.ant-btn-primary.ant-btn-sm.ant-btn-dangerous > span").click()
+        s.sleep(1)
+        self.assertText("删除成功")
+        # 刷新页面，切换到排餐标签
+        s.refresh()
+        s.sleep(1)
+        s.find("#rc-tabs-0-tab-label").click()
+        s.sleep(1)
+        # 新增排餐标签
+        s.find("#rc-tabs-0-panel-label > div > div > form > div > div:nth-child(2) > div > div > div > div > div > button:nth-child(2) > span").click()
+        s.sleep(1)
+        # 输入标签名称
+        s.find("#form_item_name").type("测试标签")
+        # 点击保存
+        s.find("body > div:nth-child(5) > div > div.ant-modal-wrap > div > div.ant-modal-content > div.ant-modal-footer > button.css-12kx9o0.ant-btn.ant-btn-primary > span").click()
+        s.sleep(1)
+        self.assertText("添加成功")
+        # 输入名称搜索
+        s.find("#rc-tabs-0-panel-label > div > div > form > div > div:nth-child(1) > div > div > div.ant-col.ant-form-item-control.css-12kx9o0 > div > div > span > input").type("测试标签")
+        s.sleep(1)
+        # 删除
+        s.find("#rc-tabs-0-panel-label > div > div > div > div > div > div > div > div > table > tbody > tr.ant-table-row.ant-table-row-level-0 > td.ant-table-cell.ant-table-cell-fix-right.ant-table-cell-fix-right-first > button.css-12kx9o0.ant-btn.ant-btn-link.ant-btn-dangerous > span").click()
+        s.sleep(1)
+        s.find("body > div:nth-child(6) > div > div > div > div.ant-popover-inner > div > div > div.ant-popconfirm-buttons > button.css-12kx9o0.ant-btn.ant-btn-primary.ant-btn-sm.ant-btn-dangerous > span").click()
+        s.sleep(1)
+        self.assertText("删除成功")
 
 
-
-        
-
-
-
-
-
-
-        pass
-
-    # def test_Afpn_2_3(self):
-    #     """
-    #     菜谱管理-排餐配置
-    #     """
-    #     s = Steps().open(f"{BaseUrl}/recipeManage/arrange")
-    #     s.sleep(3)
-    #     pass
 
     # def test_Afpn_3_1(self):
     #     """
