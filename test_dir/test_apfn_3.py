@@ -1,5 +1,6 @@
 import seldom
 from seldom import Steps
+from seldom import testdata
 
 # 测试环境 采购
 BaseUrl = "http://10.50.11.120:9005"
@@ -34,50 +35,157 @@ class AfpnTest(seldom.TestCase):
         self.get_cookies()
         print(self.get_cookies())
 
-    def test_Afpn_1_1(self):
-        """
-        基础数据-计量单位
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/basicData/measureUnit")
-        s.sleep(3)
-        pass
+    # def test_Afpn_1_1(self):
+    #     """
+    #     基础数据-计量单位
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/basicData/measureUnit")
+    #     s.sleep(1)
+    #     # 选择单位类型的第一个
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(1) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(1) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     s.sleep(1)
+    #     # 输入单位名称
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(2) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > span > input").type("test")
+    #     s.sleep(1)
+    #     # 点击新增
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(3) > div > div > div > div > div > button:nth-child(2) > span").click()
+    #     s.sleep(1)
+    #     # 单位类型选择新增
+    #     s.find("#form_item_unitType").click()
+    #     s.sleep(1)
+    #     s.find("body > div:nth-child(5) > div > div.ant-modal-wrap > div > div.ant-modal-content > div.ant-modal-body > form > div:nth-child(1) > div > div.ant-col.ant-col-12.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     s.sleep(1)
+    #     # 输入单位名称
+    #     s.find("#form_item_unitName").type("test")
+    #     # 点击确定
+    #     s.find("body > div:nth-child(5) > div > div.ant-modal-wrap > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-primary > span").click()
+    #     s.sleep(1)
+    #     # 点击删除
+    #     s.find("#app > section > section > main > div:nth-child(2) > div:nth-child(2) > div > div > div > div > div > div > table > tbody > tr.ant-table-row.ant-table-row-level-0 > td.ant-table-cell.ant-table-cell-fix-right.ant-table-cell-fix-right-first > button:nth-child(2) > span").click()
+    #     s.sleep(1)
+    #     # 二次确认
+    #     s.find("body > div:nth-child(6) > div > div > div > div.ant-popover-inner > div > div > div.ant-popconfirm-buttons > button.css-jmkaz5.ant-btn.ant-btn-primary.ant-btn-sm.ant-btn-dangerous > span").click()
+    #     s.sleep(1)
+    #     self.assertText("删除成功")
 
-    def test_Afpn_1_2(self):
-        """
-        基础数据-供应商
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/basicData/supplierList")
-        s.sleep(3)
-        pass
 
-    def test_Afpn_1_3(self):
-        """
-        基础数据-商户配置
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/basicData/merchant")
-        s.sleep(3)
-        pass
+    # def test_Afpn_1_2(self):
+    #     """
+    #     基础数据-供应商
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/basicData/supplierList")
+    #     s.sleep(1)
+    #     # 选择状态 待入驻 启用 禁用
+    #     s.find("#rc_select_0").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(3) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(2)").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(3) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div.ant-select-selector").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(3) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(3)").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(3) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div.ant-select-selector").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(3) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     s.sleep(1)
+    #     # 点击新增
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(4) > div > div > div > div > div > button:nth-child(2) > span").click()
+    #     s.sleep(1)
+    #     # 输入供应商名称
+    #     s.find("#form_item_supplierName").type("test")
+    #     # 输入纳税人登记号
+    #     s.find("#form_item_taxNo").type(testdata.get_digits(9))
+    #     # 输入法人
+    #     s.find("#form_item_legalPerson").type(testdata.username(language="zh"))
+    #     # 输入业务联系人
+    #     s.find("#form_item_contactPerson").type(testdata.username(language="zh"))
+    #     # 输入业务联系人电话
+    #     s.find("#form_item_contactPhone").type(testdata.get_phone())
+    #     # 输入企业地址
+    #     s.find("#form_item_address").type("测试地址")
+    #     # 输入注册资金
+    #     s.find("#form_item_registeredCapital").type(testdata.get_digits(6))
+    #     # 输入邮箱
+    #     s.find("#form_item_email").type(testdata.get_email())
+    #     # 选择供应商范围 选择不限
+    #     s.find("#form_item_supplyScopeType > label:nth-child(1) > span.ant-radio > input").click()
+    #     # 输入备注
+    #     s.find("#form_item_remark").type("测试备注")
+    #     # 选择供应商类别
+    #     s.find("#app > section > section > main > div:nth-child(2) > div > div > form > div.SCard-module__s-card___jVkOR > div > div:nth-child(13) > div > div > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div.ant-select-selector > div").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div > div > form > div.SCard-module__s-card___jVkOR > div > div:nth-child(13) > div > div > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(2) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     s.sleep(1)
+    #     # 点击提交
+    #     s.find("#app > section > section > main > div:nth-child(2) > div > div > form > div.ant-form-item.css-jmkaz5.s-m-t-50 > div > div > div > div > div > button.css-jmkaz5.ant-btn.ant-btn-primary.SButton-module__s-button___IkZHy > span").click()
+    #     s.sleep(1)
+    #     self.assertText("供应商名称不能重复")   
 
-    def test_Afpn_1_4(self):
-        """
-        基础数据-档口配置
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/basicData/store")
-        s.sleep(3)
-        pass
 
-    def test_Afpn_1_5(self):
-        """
-        基础数据-账号管理
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/basicData/accountManage")
-        s.sleep(3)
-        pass
+    # def test_Afpn_1_3(self):
+    #     """
+    #     基础数据-商户配置
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/basicData/merchant")
+    #     s.sleep(1)
+    #     # 选择自定义
+    #     s.find("#form_item_settlementCollectCycle > label:nth-child(2) > span.ant-radio > input").click()
+    #     s.sleep(1)
+    #     # 切换到报价配置
+    #     s.find("#rc-tabs-0-tab-2").click()
+    #     s.sleep(1)
+       
+    # def test_Afpn_1_4(self):
+    #     """
+    #     基础数据-档口配置
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/basicData/store")
+    #     s.sleep(1)
+    #     # 点击账号管理
+    #     s.find("#app > section > section > main > div:nth-child(2) > div > div.content > div > div > form > div.SCard-module__s-card___jVkOR > div:nth-child(4) > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > button:nth-child(1) > span").click()
+    #     s.sleep(1)
+    #     # 关闭窗口
+    #     s.find("body > div:nth-child(6) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > button > span > span > svg").click()
+    #     s.sleep(1)
+
+
+    # def test_Afpn_1_5(self):
+    #     """
+    #     基础数据-账号管理
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/basicData/accountManage")
+    #     s.sleep(1)
+    #     # 选择平台第一个角色
+    #     s.find("#rc_select_0").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(2) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div > ul > li:nth-child(1) > div.ant-cascader-menu-item-content").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(2) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div > ul:nth-child(2) > li:nth-child(1) > div").click()
+    #     s.sleep(1)
+    #     # 选择状态
+    #     s.find("#rc_select_1").click()
+    #     s.sleep(1)
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(3) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+    #     s.sleep(1)
+    #     # 点击新增
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(4) > div > div > div > div > div > button:nth-child(2) > span").click()
+    #     s.sleep(1)
+    #     # 输入姓名
+    #     s.find("#form_item_name").type(testdata.username(language="zh"))
+    #     # 输入手机号
+    #     s.find("#form_item_phoneNumber").type(testdata.get_phone())
+    #     # 输入密码
+    #     s.find("#form_item_password").type(testdata.get_digits(6))
+    #     # 点击取消
+    #     s.find("body > div:nth-child(5) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-default > span").click()
+    #     s.sleep(1)
 
     def test_Afpn_2_1(self):
         """
@@ -88,266 +196,266 @@ class AfpnTest(seldom.TestCase):
         s.sleep(3)
         pass
 
-    def test_Afpn_2_2(self):
-        """
-        物料管理-物料品牌
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/materialManage/materialBrand")
-        s.sleep(3)
-        pass
+    # def test_Afpn_2_2(self):
+    #     """
+    #     物料管理-物料品牌
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/materialManage/materialBrand")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_2_3(self):
-        """
-        物料管理-SPU管理
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/materialManage/spuManage")
-        s.sleep(3)
-        pass
+    # def test_Afpn_2_3(self):
+    #     """
+    #     物料管理-SPU管理
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/materialManage/spuManage")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_2_4(self):
-        """
-        物料管理-物料档案
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/materialManage/materialRecord")
-        s.sleep(3)
-        pass
+    # def test_Afpn_2_4(self):
+    #     """
+    #     物料管理-物料档案
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/materialManage/materialRecord")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_2_5(self):
-        """
-        物料管理-货源管理
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/materialManage/sourceManage")
-        s.sleep(3)
-        pass
+    # def test_Afpn_2_5(self):
+    #     """
+    #     物料管理-货源管理
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/materialManage/sourceManage")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_2_6(self):
-        """
-        物料管理-直送物料
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/materialManage/directSendMaterial")
-        s.sleep(3)
-        pass
+    # def test_Afpn_2_6(self):
+    #     """
+    #     物料管理-直送物料
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/materialManage/directSendMaterial")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_2_7(self):
-        """
-        物料管理-常用物料
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/materialManage/commonUseMaterial")
-        s.sleep(3)
-        pass
+    # def test_Afpn_2_7(self):
+    #     """
+    #     物料管理-常用物料
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/materialManage/commonUseMaterial")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_3_1(self):
-        """
-        价格管理-采购价格
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/priceManage/purchasePrice")
-        s.sleep(3)
-        pass
+    # def test_Afpn_3_1(self):
+    #     """
+    #     价格管理-采购价格
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/priceManage/purchasePrice")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_3_2(self):
-        """
-        价格管理-出库价格
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/priceManage/retrievalPrice")
-        s.sleep(3)
-        pass
+    # def test_Afpn_3_2(self):
+    #     """
+    #     价格管理-出库价格
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/priceManage/retrievalPrice")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_3_3(self):
-        """
-        价格管理-调价管理
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/priceManage/adjustPrice")
-        s.sleep(3)
-        pass
+    # def test_Afpn_3_3(self):
+    #     """
+    #     价格管理-调价管理
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/priceManage/adjustPrice")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_4_1(self):
-        """
-        采购管理-物料申请单
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/purchaseManage/materialApplication")
-        s.sleep(3)
-        pass
+    # def test_Afpn_4_1(self):
+    #     """
+    #     采购管理-物料申请单
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/purchaseManage/materialApplication")
+    #     s.sleep(3)
+    #     pass
     
-    def test_Afpn_4_2(self):
-        """
-        采购管理-竞价采购
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/purchaseManage/competition")
-        s.sleep(3)
-        pass
+    # def test_Afpn_4_2(self):
+    #     """
+    #     采购管理-竞价采购
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/purchaseManage/competition")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_4_3(self):
-        """
-        采购管理-报价采购
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/purchaseManage/quotation")
-        s.sleep(3)
-        pass
+    # def test_Afpn_4_3(self):
+    #     """
+    #     采购管理-报价采购
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/purchaseManage/quotation")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_4_4(self):
-        """
-        采购管理-采购订单
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/purchaseManage/purchaseOrder")
-        s.sleep(3)
-        pass
+    # def test_Afpn_4_4(self):
+    #     """
+    #     采购管理-采购订单
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/purchaseManage/purchaseOrder")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_4_5(self):
-        """
-        采购管理-结算主体
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/purchaseManage/purchasePrincipal")
-        s.sleep(3)
-        pass
+    # def test_Afpn_4_5(self):
+    #     """
+    #     采购管理-结算主体
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/purchaseManage/purchasePrincipal")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_1(self):
-        """
-        库存管理-验收管理
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/inboundAcceptance")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_1(self):
+    #     """
+    #     库存管理-验收管理
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/inboundAcceptance")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_2(self):
-        """
-        库存管理-领用管理
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/outboundPickOut")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_2(self):
+    #     """
+    #     库存管理-领用管理
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/outboundPickOut")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_3(self):
-        """
-        库存管理-入库单
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/inboundReceipt")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_3(self):
+    #     """
+    #     库存管理-入库单
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/inboundReceipt")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_4(self):
-        """
-        库存管理-出库单
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/outboundReceipt")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_4(self):
+    #     """
+    #     库存管理-出库单
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/outboundReceipt")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_5(self):
-        """
-        库存管理-库存查询
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/stockSearch")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_5(self):
+    #     """
+    #     库存管理-库存查询
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/stockSearch")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_6(self):
-        """
-        库存管理-库存流水查询
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/stockJournalizing")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_6(self):
+    #     """
+    #     库存管理-库存流水查询
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/stockJournalizing")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_7(self):
-        """
-        库存管理-预警配置
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/alertConfig")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_7(self):
+    #     """
+    #     库存管理-预警配置
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/alertConfig")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_8(self):
-        """
-        库存管理-仓库
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/wareHouse")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_8(self):
+    #     """
+    #     库存管理-仓库
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/wareHouse")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_5_9(self):
-        """
-        库存管理-配送点
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/stockManage/distributionSite")
-        s.sleep(3)
-        pass
+    # def test_Afpn_5_9(self):
+    #     """
+    #     库存管理-配送点
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/stockManage/distributionSite")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_6_1(self):
-        """
-        财务管理-供应商对账
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/financeManage/supplierReconciliation")
-        s.sleep(3)
-        pass
+    # def test_Afpn_6_1(self):
+    #     """
+    #     财务管理-供应商对账
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/financeManage/supplierReconciliation")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_6_2(self):
-        """
-        财务管理-验收统计
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/financeManage/acceptanceStatistics")
-        s.sleep(3)
-        pass
+    # def test_Afpn_6_2(self):
+    #     """
+    #     财务管理-验收统计
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/financeManage/acceptanceStatistics")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_6_3(self):
-        """
-        财务管理-档口对账
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/financeManage/storeReconciliation")
-        s.sleep(3)
-        pass
+    # def test_Afpn_6_3(self):
+    #     """
+    #     财务管理-档口对账
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/financeManage/storeReconciliation")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_7_1(self):
-        """
-        数据报表-档口领用统计
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/dataReport/storeReceiveStatistics")
-        s.sleep(3)
-        pass
+    # def test_Afpn_7_1(self):
+    #     """
+    #     数据报表-档口领用统计
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/dataReport/storeReceiveStatistics")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_8_1(self):
-        """
-        导入导出-导入管理
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/dataCenter/importedFiles")
-        s.sleep(3)
-        pass
+    # def test_Afpn_8_1(self):
+    #     """
+    #     导入导出-导入管理
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/dataCenter/importedFiles")
+    #     s.sleep(3)
+    #     pass
 
-    def test_Afpn_8_2(self):
-        """
-        导入导出-导出管理
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/dataCenter/exportedFiles")
-        s.sleep(3)
-        pass
+    # def test_Afpn_8_2(self):
+    #     """
+    #     导入导出-导出管理
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/dataCenter/exportedFiles")
+    #     s.sleep(3)
+    #     pass
 
 
 if __name__ == '__main__':

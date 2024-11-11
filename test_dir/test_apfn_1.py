@@ -847,7 +847,7 @@ class AfpnTest(seldom.TestCase):
         安全-操作日志
         """
         s = Steps().open(f"{BaseUrl}/safe/sys/operateLog")
-        s.sleep(1)
+        s.sleep(2)
         # 商户名称
         s.find('#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div:nth-child(1) > div > div.el-input.el-input--suffix > input').click()
         s.sleep(1)
