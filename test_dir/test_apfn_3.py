@@ -227,7 +227,7 @@ class AfpnTest(seldom.TestCase):
     #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div.ant-col.ant-col-xs-24.ant-col-sm-24.ant-col-md-16.ant-col-lg-16.ant-col-xl-12.ant-col-xxl-8.SSearchCol-module__s-search-col___5B72G.css-jmkaz5 > div > div > div > div > div > button:nth-child(2) > span").click()
     #     s.sleep(1)
     #     # 输入品牌编码名称
-    #     Scode = testdata.get_digits(8)
+    #     Scode = testdata.get_digits(6)
     #     s.find("#form_item_brandCode").type(Scode)
     #     s.find("#form_item_brandName").type(testdata.username(language="zh"))
     #     # 点击确定
@@ -306,6 +306,7 @@ class AfpnTest(seldom.TestCase):
     #     s.sleep(1)
     #     # 选择第一个SPU
     #     s.find("body > div:nth-child(6) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > div:nth-child(2) > div:nth-child(2) > div > div > div > div > div > div.ant-table-body > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-selection-column > label > span > input").click()
+    #     s.sleep(1)
     #     s.find("body > div:nth-child(6) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-primary > span").click()
     #     s.sleep(1)
     #     # 选择品牌
@@ -313,6 +314,7 @@ class AfpnTest(seldom.TestCase):
     #     s.sleep(1)
     #     # 选择第一个品牌
     #     s.find("body > div:nth-child(7) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div:nth-child(2) > div > div > div > div > div > div.ant-table-body > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-selection-column > label > span > input").click()
+    #     s.sleep(1)
     #     s.find("body > div:nth-child(7) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-primary > span").click()
     #     s.sleep(1)
     #     # 输入规格
@@ -388,6 +390,7 @@ class AfpnTest(seldom.TestCase):
     #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16.s-m-t-16 > form > div > div:nth-child(6) > div > div > div > div > div > button:nth-child(2) > span").click()
     #     s.sleep(1)
     #     s.find("body > div:nth-child(5) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > div:nth-child(2) > div:nth-child(2) > div > div > div > div > div > div.ant-table-body > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-selection-column > label > span > input").click()
+    #     s.sleep(1)
     #     s.find("body > div:nth-child(5) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-primary > span").click()
     #     s.sleep(1)
     #     # 点击提交
@@ -417,12 +420,14 @@ class AfpnTest(seldom.TestCase):
     #     s.find("#app > section > section > main > div:nth-child(2) > div > div > form > div.SCard-module__s-card___jVkOR > div:nth-child(2) > div > div.ant-col.ant-col-md-10.ant-col-lg-8.ant-col-xl-6.ant-form-item-control.css-jmkaz5 > div > div > span > input").click()
     #     s.sleep(1)
     #     s.find("body > div:nth-child(6) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div:nth-child(2) > div > div > div > div > div > div > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-selection-column > label > span > input").click()
+    #     s.sleep(1)
     #     s.find("body > div:nth-child(6) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-primary > span").click()
     #     s.sleep(1)
     #     # 输入物料编码 选择第一个
     #     s.find("#app > section > section > main > div:nth-child(2) > div > div > form > div.SCard-module__s-card___jVkOR > div:nth-child(3) > div > div.ant-col.ant-col-md-10.ant-col-lg-8.ant-col-xl-6.ant-form-item-control.css-jmkaz5 > div > div > span > input").click()
     #     s.sleep(1)
     #     s.find("body > div:nth-child(7) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > div:nth-child(2) > div:nth-child(2) > div > div > div > div > div > div.ant-table-body > table > tbody > tr.ant-table-row.ant-table-row-level-0 > td.ant-table-cell.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-selection-column > label > span > input").click()
+    #     s.sleep(1)
     #     s.find("body > div:nth-child(7) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-primary > span").click()
     #     s.sleep(1)
     #     s.find("#app > section > section > main > div:nth-child(2) > div > div > form > div.ant-form-item.css-jmkaz5.s-m-t-25.s-flex-center.s-nowrap > div > div > div > div > button.css-jmkaz5.ant-btn.ant-btn-primary.SButton-module__s-button___IkZHy > span").click()
@@ -437,29 +442,29 @@ class AfpnTest(seldom.TestCase):
 
 
 
-    def test_Afpn_2_7(self):
-        """
-        物料管理-常用物料
-        """
-        s = Steps()
-        s.open(f"{BaseUrl}/materialManage/commonUseMaterial")
-        s.sleep(1)
-        # 添加物料
-        s.find("#app > section > section > main > div:nth-child(2) > div > div > section > main > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div.ant-col.ant-col-xs-24.ant-col-sm-24.ant-col-md-16.ant-col-lg-16.ant-col-xl-12.ant-col-xxl-8.SSearchCol-module__s-search-col___5B72G.css-jmkaz5 > div > div > div > div > div > button:nth-child(2) > span").click()
-        s.sleep(1)
-        # 选择第一个，确认添加
-        s.find("#app > section > section > main > div:nth-child(2) > div:nth-child(2) > div > div > div > div > div > div > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-selection-column > label > span > input").click()
-        s.find("#breadcrumb-right > div > button.css-jmkaz5.ant-btn.ant-btn-primary.SButton-module__s-button___IkZHy > span").click()
-        s.sleep(1)
-        self.assertText("添加成功")
-        # 搜索添加的常用物料 并删除
-        s.find("#app > section > section > main > div:nth-child(2) > div > div > section > main > div:nth-child(2) > div.ant-table-wrapper.STable-module__s-table___YskNF.css-jmkaz5 > div > div > div > div > div > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-right.ant-table-cell-fix-right-first > button > span").click()
-        s.sleep(1)        
-        # 二次确认
-        s.find("body > div:nth-child(6) > div > div > div > div.ant-popover-inner > div > div > div.ant-popconfirm-buttons > button.css-jmkaz5.ant-btn.ant-btn-primary.ant-btn-sm.ant-btn-dangerous > span").click()
-        s.sleep(1)
-        self.assertText("删除成功")
-        pass
+    # def test_Afpn_2_7(self):
+    #     """
+    #     物料管理-常用物料
+    #     """
+    #     s = Steps()
+    #     s.open(f"{BaseUrl}/materialManage/commonUseMaterial")
+    #     s.sleep(1)
+    #     # 添加物料
+    #     s.find("#app > section > section > main > div:nth-child(2) > div > div > section > main > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div.ant-col.ant-col-xs-24.ant-col-sm-24.ant-col-md-16.ant-col-lg-16.ant-col-xl-12.ant-col-xxl-8.SSearchCol-module__s-search-col___5B72G.css-jmkaz5 > div > div > div > div > div > button:nth-child(2) > span").click()
+    #     s.sleep(1)
+    #     # 选择第一个，确认添加
+    #     s.find("#app > section > section > main > div:nth-child(2) > div:nth-child(2) > div > div > div > div > div > div > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-selection-column > label > span > input").click()
+    #     s.find("#breadcrumb-right > div > button.css-jmkaz5.ant-btn.ant-btn-primary.SButton-module__s-button___IkZHy > span").click()
+    #     s.sleep(1)
+    #     self.assertText("添加成功")
+    #     # 搜索添加的常用物料 并删除
+    #     s.find("#app > section > section > main > div:nth-child(2) > div > div > section > main > div:nth-child(2) > div.ant-table-wrapper.STable-module__s-table___YskNF.css-jmkaz5 > div > div > div > div > div > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-right.ant-table-cell-fix-right-first > button > span").click()
+    #     s.sleep(1)        
+    #     # 二次确认
+    #     s.find("body > div:nth-child(6) > div > div > div > div.ant-popover-inner > div > div > div.ant-popconfirm-buttons > button.css-jmkaz5.ant-btn.ant-btn-primary.ant-btn-sm.ant-btn-dangerous > span").click()
+    #     s.sleep(1)
+    #     self.assertText("删除成功")
+
 
     # def test_Afpn_3_1(self):
     #     """
@@ -467,8 +472,14 @@ class AfpnTest(seldom.TestCase):
     #     """
     #     s = Steps()
     #     s.open(f"{BaseUrl}/priceManage/purchasePrice")
-    #     s.sleep(3)
-    #     pass
+    #     s.sleep(1)
+    #     # 点击日常调价
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(9) > div > div > div > div > div > button:nth-child(2) > span").click()
+    #     s.sleep(1)
+    #     # 点击取消
+    #     s.find("#breadcrumb-right > div > button.css-jmkaz5.ant-btn.ant-btn-default.SButton-module__s-button___IkZHy > span").click()
+    #     s.sleep(1)
+
 
     # def test_Afpn_3_2(self):
     #     """
@@ -476,17 +487,70 @@ class AfpnTest(seldom.TestCase):
     #     """
     #     s = Steps()
     #     s.open(f"{BaseUrl}/priceManage/retrievalPrice")
-    #     s.sleep(3)
-    #     pass
+    #     s.sleep(1)
+    #     # 点击物料调价
+    #     s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(8) > div > div > div > div > div > button:nth-child(2) > span").click()
+    #     s.sleep(1)
+    #     # 点击物料名称
+    #     s.find("#app > section > section > main > div:nth-child(2) > form > div.SCard-module__s-card___jVkOR > div > div > div:nth-child(1) > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > span > input").click()
+    #     s.sleep(1)
+    #     # 选择第一个 确定
+    #     s.find("body > div:nth-child(6) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > div:nth-child(2) > div:nth-child(2) > div > div > div > div > div > div.ant-table-body > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-selection-column > label > span > input").click()
+    #     s.sleep(1)
+    #     s.find("body > div:nth-child(6) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-primary > span").click()
+    #     s.sleep(1)
+    #     # 输入调整后出库价 备注
+    #     s.find("#form_item_purchasePrice").type("100")
+    #     s.find("#form_item_remark").type("测试备注")
+    #     # 点击提交
+    #     s.find("#app > section > section > main > div:nth-child(2) > form > div.ant-form-item.css-jmkaz5.s-m-t-25.s-flex-x-center > div > div > div > div > button.css-jmkaz5.ant-btn.ant-btn-primary.SButton-module__s-button___IkZHy > span").click()
+    #     s.sleep(1)
+    #     self.assertText("提交成功")
+    #     # 删除
+    #     s.find("#app > section > section > main > div:nth-child(2) > div:nth-child(2) > div.ant-table-wrapper.STable-module__s-table___YskNF.css-jmkaz5 > div > div > div > div > div > table > tbody > tr:nth-child(2) > td.ant-table-cell.ant-table-cell-fix-right.ant-table-cell-fix-right-first > button:nth-child(3)").click()
+    #     s.sleep(1)
+    #     s.find("body > div:nth-child(6) > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-footer > button.css-jmkaz5.ant-btn.ant-btn-primary > span").click()
+    #     s.sleep(1)
+    #     self.assertText("删除成功")
 
-    # def test_Afpn_3_3(self):
-    #     """
-    #     价格管理-调价管理
-    #     """
-    #     s = Steps()
-    #     s.open(f"{BaseUrl}/priceManage/adjustPrice")
-    #     s.sleep(3)
-    #     pass
+
+
+    def test_Afpn_3_3(self):
+        """
+        价格管理-调价管理
+        """
+        s = Steps()
+        s.open(f"{BaseUrl}/priceManage/adjustPrice")
+        s.sleep(1)
+        # 选择类型
+        s.find("#rc_select_0").click()
+        s.sleep(1)
+        # 临时调价
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(2)").click()
+        s.sleep(1)
+        # 特殊调价
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div.ant-select-selector > span.ant-select-selection-item").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(4) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+        s.sleep(1)
+        # 状态
+        s.find("#rc_select_1").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(1)").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div.ant-select-selector > span.ant-select-selection-item").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(2)").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div.ant-select-selector > span.ant-select-selection-item").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(3)").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div.ant-select-selector > span.ant-select-selection-item").click()
+        s.sleep(1)
+        s.find("#app > section > section > main > div:nth-child(2) > div.SCard-module__s-card___jVkOR.s-m-b-16 > form > div > div:nth-child(5) > div > div > div.ant-col.ant-form-item-control.css-jmkaz5 > div > div > div > div:nth-child(3) > div > div > div > div.rc-virtual-list > div.rc-virtual-list-holder > div > div > div:nth-child(4)").click()
+        s.sleep(1)
+
 
     # def test_Afpn_4_1(self):
     #     """
