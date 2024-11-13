@@ -1,6 +1,7 @@
 import seldom
 from seldom import Steps
 from seldom import testdata
+from selenium.webdriver import ChromeOptions
 
 # 测试环境 采购
 BaseUrl = "http://10.50.11.120:9005"
@@ -14,7 +15,6 @@ class AfpnTest(seldom.TestCase):
     采购
     """
     def start(self):
-
         print("开始测试")
 
     def end(self):
@@ -1182,10 +1182,17 @@ class AfpnTest(seldom.TestCase):
 
 
 if __name__ == '__main__':
+    chrome_options = ChromeOptions()
+    chrome_options.add_argument("--headless=new")  # 开启 headless 模式
+    browser = {
+        "browser": "chrome",
+        "options": chrome_options
+    }
     seldom.main(
                 case='test_apfn_3.AfpnTest', 
-                browser="gc", 
+                browser=browser,  # 浏览器驱动
+                # browser="gc", 
                 # browser="firefox",
                 tester="tzk",
-                debug=True
+                # debug=True
                 )
