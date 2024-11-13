@@ -9,9 +9,11 @@ if __name__ == '__main__':
         "options": chrome_options
     }
     seldom.main(
-        path="./test_dir/",
+        path=["./test_dir/test_apfn_1.py","./test_dir/test_apfn_2.py","./test_dir/test_apfn_3.py"],
+        # case= "test_dir.test_apfn_1",
         browser=browser,  # 浏览器驱动
         # browser="gc", # google chrome
         # rerun=3,
         # debug=True,
+        tester="tzk"
     )
