@@ -1,5 +1,8 @@
 import seldom
 from seldom import Steps
+from selenium.webdriver import ChromeOptions
+
+
 
 # 测试环境 数字餐厅
 BaseUrl = "http://10.50.11.120:9002"
@@ -846,9 +849,24 @@ class AfpnTest(seldom.TestCase):
         self.assertStatusOk()
 
 
+
+
+
+
+    
+# 增加浏览器代理示例
 if __name__ == "__main__":
+    # proxy = "127.0.0.1:1080"  # 示例代理地址和端口
+
+    # chrome_options = ChromeOptions()
+    # chrome_options.add_argument(f"--proxy-server={proxy}")
+    # browser = {
+    #     "browser": "chrome",
+    #     "options": chrome_options,
+    # }
     seldom.main(
         case="test_apfn_4.AfpnTest",
+        # browser=browser
         browser="gc",
         # browser="firefox",
         tester="tzk",
