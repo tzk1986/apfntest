@@ -73,7 +73,7 @@ class AfpnTest(seldom.TestCase):
         s.sleep()
         self.assertStatusOk()
         s.find(
-            "#app > section > section > section > main > div.main > div.s-card > div > div.search_option_left.s-gap-6-15 > div.s-gap-6-10.s-g-l-0 > button > span"    
+            "#app > section > section > section > main > div.main > div.s-card > div > div.search_option_left.s-gap-6-15 > div.s-gap-6-10.s-g-l-0 > button"    
         ).click()
         s.sleep()
         # 列表查询
@@ -90,7 +90,7 @@ class AfpnTest(seldom.TestCase):
         s.sleep()
         self.assertStatusOk()
         s.find(
-            "#app > section > section > section > main > section > section > main > div.main > div.s-card > div > div > div.s-gap-6-10.s-g-l-0 > button"
+            "#app > section > section > section > main > div.main > div.s-card > div > div > div.s-gap-6-10.s-g-l-0 > button"
         ).click()
         s.sleep()
         # 列表查询
