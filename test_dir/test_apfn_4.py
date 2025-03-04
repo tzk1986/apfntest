@@ -36,16 +36,16 @@ class AfpnTest(seldom.TestCase):
         print(f"{BaseUrl}/login")
         s = Steps().open(f"{BaseUrl}/login")
 
-        s.find("#app > div > form > div:nth-child(2) > div > div > input").type(
+        s.find("#app > div > div.login-box.s-h-center > form > div:nth-child(2) > div > div > input").type(
             "18335161013"
         )
-        s.find("#app > div > form > div:nth-child(3) > div > div > input").type(
+        s.find("#app > div > div.login-box.s-h-center > form > div:nth-child(3) > div > div > input").type(
             "112233"
         )
         s.find(
-            "#app > div > form > div:nth-child(4) > div > div > div.login-input-code.el-input.el-input--prefix > input"
+            "#app > div > div.login-box.s-h-center > form > div:nth-child(4) > div > div > div.login-input-code.el-input.el-input--prefix > input"
         ).type("1")
-        s.find("#app > div > form > div:nth-child(5) > div > button").click()
+        s.find("#app > div > div.login-box.s-h-center > form > div:nth-child(5) > div > button").click()
         s.sleep()
         self.get_cookies()
         print(self.get_cookies())
