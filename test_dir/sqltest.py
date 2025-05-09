@@ -504,7 +504,7 @@ def fetch_all_results_and_export():
         data = pd.merge(data, weekly_counts[['周数', '菜名', '重复比例']], on=['周数', '菜名'], how='left')
 
         # 保存单独菜品的重复率和连续排餐标识
-        sheet1_data = data[['日期', '星期', '菜名', '连续排餐标记', '重复比例']]
+        sheet1_data = data[['日期', '星期', '菜名','重量', '连续排餐标记', '重复比例']]
         # 确保 sheet1 中的日期只显示年月日
         sheet1_data['日期'] = pd.to_datetime(sheet1_data['日期']).dt.strftime('%Y-%m-%d')
         
