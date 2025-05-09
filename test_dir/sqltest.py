@@ -17,7 +17,7 @@ query1 = """SELECT
     m.cook_weight AS 重量,
     d.price AS 50克价格,
     d.category1 AS 大类,
-    d.cook_method AS 方法 
+    d.cook_method AS 制作方式 
 FROM
     algorithm_test_dish d
     INNER JOIN algorithm_test_plan_item m ON d.id = m.dish_id 
@@ -172,9 +172,12 @@ def fetch_data_and_export3():
 
         # 添加人均消耗菜品重量和人均消费金额列
         data['预估人数'] = data['星期'].map(estimated_people)
-        data['人均消耗重量'] = data['总重量'] / data['预估人数']
-        data['人均消费金额'] = data['总价格'] / data['预估人数']
+        data['人均消耗重量'] = (data['总重量'] / data['预估人数']).round(2)
+        data['人均消费金额'] = (data['总价格'] / data['预估人数']).round(2)
 
+        # 确保总价格保留两位小数
+        data['总价格'] = data['总价格'].round(2)
+        
         # 查询每天菜品分类的总重量
         category_query = """SELECT 
             m.cook_date AS 日期,
@@ -196,18 +199,34 @@ def fetch_data_and_export3():
         # 计算每天各分类的占比
         total_weight_per_day = category_data.groupby('日期')['分类总重量'].transform('sum')
         category_data['分类占比'] = (category_data['分类总重量'] / total_weight_per_day * 100).round(2)
-        category_data['分类占比'] = category_data['分类占比'].astype(str) + "%"
 
-        # 将分类占比格式化为字符串
-        category_summary = category_data.groupby('日期').apply(
-            lambda x: "；".join(
-                f"{row['菜品大类']}: {row['分类占比']}" for _, row in x.iterrows()
-            )
-        ).reset_index(name='分类占比汇总')
+        # 格式化分类占比为字符串
+        category_summary = category_data.pivot(index='日期', columns='菜品大类', values='分类占比').fillna(0)
+        category_summary['分类占比汇总'] = category_summary.apply(
+            lambda row: "（大荤:小荤:素菜）：" + ":".join(f"{row.get(cat, 0):.2f}%" for cat in ['大荤', '小荤', '素菜']),
+            axis=1
+        )
+        category_summary = category_summary.reset_index()[['日期', '分类占比汇总']]
 
         # 合并分类占比汇总到主数据
         data = pd.merge(data, category_summary, on='日期', how='left')
 
+        # 使用 query1 查询制作方式数据
+        cook_method_data = pd.read_sql(query1, connection)
+
+        # 按日期和制作方式统计数量
+        cook_method_summary = cook_method_data.groupby(['日期', '制作方式']).size().unstack(fill_value=0)
+
+        # 格式化制作方式比例为字符串
+        cook_method_summary['制作方式比例'] = cook_method_summary.apply(
+            lambda row: "（炒菜机:蒸烤箱:人工）：" + ":".join(row.astype(str)), axis=1
+        )
+        cook_method_summary = cook_method_summary.reset_index()[['日期', '制作方式比例']]
+
+        # 合并制作方式比例到主数据
+        data = pd.merge(data, cook_method_summary, on='日期', how='left')
+        
+        
         # 导出为 Excel 文件
         data.to_excel(output_file3, index=False)
         print(f"数据已成功导出到 {output_file3}")
@@ -389,11 +408,12 @@ def fetch_data_and_export3():
 # if __name__ == "__main__":
 #     fetch_data_and_export6()
 
+
 def fetch_all_results_and_export():
     """
     查看菜品是否连续排餐，以及菜品重复排餐比例
     查看每天排餐大类重量比例，以及细化分类数量
-    执行多个查询并将结果导出到单个 Excel 文件
+    执行多个查询并将结果导出到多个 Excel Sheet
     """
     try:
         # 连接数据库
@@ -450,11 +470,33 @@ def fetch_all_results_and_export():
         category_data['日期'] = pd.to_datetime(category_data['日期'])
         total_weight_per_day = category_data.groupby('日期')['分类总重量'].transform('sum')
         category_data['分类占比'] = (category_data['分类总重量'] / total_weight_per_day * 100).round(2)
-        category_summary = category_data.groupby('日期').apply(
-            lambda x: "；".join(
-                f"{row['菜品大类']} {row['分类占比']}%" for _, row in x.iterrows()
-            )
-        ).reset_index(name='分类占比汇总')
+
+        # 格式化分类占比为字符串
+        category_summary = category_data.pivot(index='日期', columns='菜品大类', values='分类占比').fillna(0)
+        category_summary['分类占比汇总'] = category_summary.apply(
+            lambda row: "（大荤:小荤:素菜）：" + ":".join(f"{row.get(cat, 0):.2f}%" for cat in ['大荤', '小荤', '素菜']),
+            axis=1
+        )
+        category_summary = category_summary.reset_index()
+
+        # 使用 query1 查询制作方式数据
+        cook_method_data = pd.read_sql(query1, connection)
+
+        # 按日期和制作方式统计数量
+        cook_method_summary = cook_method_data.groupby(['日期', '制作方式']).size().unstack(fill_value=0)
+
+        # 格式化制作方式比例为字符串
+        cook_method_summary['制作方式比例'] = cook_method_summary.apply(
+            lambda row: "（炒菜机:蒸烤箱:人工）：" + ":".join(row.astype(str)), axis=1
+        )
+        cook_method_summary = cook_method_summary.reset_index()[['日期', '制作方式比例']]
+
+        # 确保日期列一致
+        category_summary['日期'] = pd.to_datetime(category_summary['日期'])
+        cook_method_summary['日期'] = pd.to_datetime(cook_method_summary['日期'])
+        
+        # 合并分类占比汇总和制作方式比例到主数据
+        sheet2_data = pd.merge(category_summary[['日期', '分类占比汇总']], cook_method_summary, on='日期', how='left')
 
         # 计算细化分类
         detailed_query = """SELECT 
@@ -476,16 +518,15 @@ def fetch_all_results_and_export():
         detailed_summary = detailed_data.groupby(['日期', '菜品大类']).apply(
             lambda x: "，".join(f"{row['细化分类']}({row['分类数量']})" for _, row in x.iterrows())
         ).reset_index(name='细化分类汇总')
-        # 确保 category_summary 的 '日期' 列为 datetime 类型
-        category_summary['日期'] = pd.to_datetime(category_summary['日期'])  # 确保日期列为 datetime 类型
-        detailed_summary['日期'] = pd.to_datetime(detailed_summary['日期'])  # 确保日期列为 datetime 类型
-        # 保存每天的分类比例和细化分类
-        sheet2_data = pd.merge(category_summary, detailed_summary, on='日期', how='left')
 
-        # 导出到 Excel 文件的两个 Sheet
+        # 保存细化分类汇总到单独的 Sheet
+        sheet3_data = detailed_summary
+
+        # 导出到 Excel 文件的多个 Sheet
         with pd.ExcelWriter(output_all) as writer:
             sheet1_data.to_excel(writer, sheet_name='菜品重复率与连续排餐', index=False)
-            sheet2_data.to_excel(writer, sheet_name='分类比例与细化分类', index=False)
+            sheet2_data.to_excel(writer, sheet_name='分类比例与制作方式', index=False)
+            sheet3_data.to_excel(writer, sheet_name='细化分类汇总', index=False)
 
         print(f"所有结果已成功导出到 {output_all}")
 
@@ -502,5 +543,5 @@ def fetch_all_results_and_export():
 
 if __name__ == "__main__":
     # fetch_data_and_export2()
-    fetch_data_and_export3()
+    # fetch_data_and_export3()
     fetch_all_results_and_export()
