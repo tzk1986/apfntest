@@ -178,6 +178,33 @@ def fetch_data_and_export3():
         # 确保总价格保留两位小数
         data['总价格'] = data['总价格'].round(2)
         
+        # 标准值和浮动比例
+        standard_weight = 350  # 标准人均消耗重量
+        weight_tolerance = 0.02  # 浮动比例
+        standard_price = 24  # 标准人均消费金额
+        price_tolerance = 0.04  # 浮动比例
+
+        # 计算人均消耗重量浮动范围和浮动值
+        data['重量浮动范围'] = data.apply(
+            lambda row: f"{(standard_weight * (1 - weight_tolerance)):.2f}-{(standard_weight * (1 + weight_tolerance)):.2f}",
+            axis=1
+        )
+        data['重量浮动值'] = (data['人均消耗重量'] - standard_weight).round(2)
+        data['重量是否在范围内'] = data['人均消耗重量'].apply(
+            lambda x: "在范围内" if standard_weight * (1 - weight_tolerance) <= x <= standard_weight * (1 + weight_tolerance) else "超出范围"
+        )
+
+        # 计算人均消费金额浮动范围和浮动值
+        data['价格浮动范围'] = data.apply(
+            lambda row: f"{(standard_price * (1 - price_tolerance)):.2f}-{(standard_price * (1 + price_tolerance)):.2f}",
+            axis=1
+        )
+        data['价格浮动值'] = (data['人均消费金额'] - standard_price).round(2)
+        data['价格是否在范围内'] = data['人均消费金额'].apply(
+            lambda x: "在范围内" if standard_price * (1 - price_tolerance) <= x <= standard_price * (1 + price_tolerance) else "超出范围"
+        )
+
+        
         # 查询每天菜品分类的总重量
         category_query = """SELECT 
             m.cook_date AS 日期,
@@ -543,5 +570,5 @@ def fetch_all_results_and_export():
 
 if __name__ == "__main__":
     # fetch_data_and_export2()
-    # fetch_data_and_export3()
-    fetch_all_results_and_export()
+    fetch_data_and_export3()
+    # fetch_all_results_and_export()
