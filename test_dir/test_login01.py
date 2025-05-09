@@ -92,10 +92,10 @@ class AfpnTest(seldom.TestCase):
         s = Steps().open(f"{BaseUrl}/login")
         
         
-        s.find('#app > div > form > div:nth-child(2) > div > div > input').type("18335161013")
-        s.find('#app > div > form > div:nth-child(3) > div > div > input').type("112233")
+        s.find('#app > div > div.login-box.s-h-center > form > div:nth-child(2) > div > div > input').type("18335161013")
+        s.find('#app > div > div.login-box.s-h-center > form > div:nth-child(3) > div > div > input').type("112233")
         # 获取验证码图片的URL
-        captcha_url = self.get_attribute(css="#app > div > form > div:nth-child(4) > div > div > div.login-kaptcha-code > img", attribute="src")
+        captcha_url = self.get_attribute(css="#app > div > div.login-box.s-h-center > form > div:nth-child(4) > div > div > div.login-kaptcha-code > img", attribute="src")
         # print(captcha_url)
 
         # 获取图片的base64编码信息
@@ -111,7 +111,7 @@ class AfpnTest(seldom.TestCase):
         # captcha_text = recognize_captcha('pic/captcha.png')
         # print(f"Captcha text: {captcha_text}")
 
-        image = cv2.imread('pic/captcha.png')
+        image = cv2.imread('pic/20250401.png')
 
         # 转换为HSV颜色空间
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -160,10 +160,6 @@ class AfpnTest(seldom.TestCase):
         self.get_cookies()
         print(self.get_cookies())
         
-
-
-
-
 
 
 if __name__ == '__main__':
