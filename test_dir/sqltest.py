@@ -20,7 +20,9 @@ query1 = """SELECT
     d.cook_method AS 制作方式 
 FROM
     algorithm_test_dish d
-    INNER JOIN algorithm_test_plan_item m ON d.id = m.dish_id 
+    INNER JOIN algorithm_test_plan_item m ON d.id = m.dish_id
+WHERE
+	m.plan_id = 3 
 ORDER BY
     m.cook_date;"""  # 替换为你的查询语句
  
@@ -31,7 +33,9 @@ query2 = """SELECT
     SUM( ( m.cook_weight / 50 ) * d.price ) AS 总价格 
 FROM
     algorithm_test_plan_item m
-    INNER JOIN algorithm_test_dish d ON m.dish_id = d.id 
+    INNER JOIN algorithm_test_dish d ON m.dish_id = d.id
+WHERE
+	m.plan_id = 3 
 GROUP BY
     m.cook_date 
 ORDER BY
@@ -48,6 +52,8 @@ INNER JOIN
     algorithm_test_dish d
 ON 
     m.dish_id = d.id
+WHERE
+	m.plan_id = 3
 GROUP BY 
     m.cook_date, d.category1  -- 按日期和大类双重分组
 ORDER BY 
@@ -161,13 +167,25 @@ def fetch_data_and_export3():
         else:
             print("警告: 数据中未找到 '日期' 列，无法添加星期信息。")
 
+        # 将星期几的英文转换为中文
+        day_name_map = {
+            "Monday": "星期一",
+            "Tuesday": "星期二",
+            "Wednesday": "星期三",
+            "Thursday": "星期四",
+            "Friday": "星期五",
+            "Saturday": "星期六",
+            "Sunday": "星期日",
+        }
+        data['星期'] = data['星期'].map(day_name_map)
+
         # 预估人数映射（星期一到星期五不同）
         estimated_people = {
-            "Monday": 300,
-            "Tuesday": 280,
-            "Wednesday": 280,
-            "Thursday": 280,
-            "Friday": 250,
+            "星期一": 300,
+            "星期二": 280,
+            "星期三": 280,
+            "星期四": 280,
+            "星期五": 250,
         }
 
         # 添加人均消耗菜品重量和人均消费金额列
@@ -432,8 +450,6 @@ def fetch_data_and_export3():
 #             connection.close()
 #             print("数据库连接已关闭。")
 
-# if __name__ == "__main__":
-#     fetch_data_and_export6()
 
 
 def fetch_all_results_and_export():
@@ -459,6 +475,18 @@ def fetch_all_results_and_export():
         # 添加星期列
         data['星期'] = data['日期'].dt.day_name()
 
+        # 将星期几的英文转换为中文
+        day_name_map = {
+            "Monday": "星期一",
+            "Tuesday": "星期二",
+            "Wednesday": "星期三",
+            "Thursday": "星期四",
+            "Friday": "星期五",
+            "Saturday": "星期六",
+            "Sunday": "星期日",
+        }
+        data['星期'] = data['星期'].map(day_name_map)
+
         # 验证连续排餐
         data.sort_values(by=['菜名', '日期'], inplace=True)
         data['连续排餐标记'] = (
@@ -476,8 +504,10 @@ def fetch_all_results_and_export():
         data = pd.merge(data, weekly_counts[['周数', '菜名', '重复比例']], on=['周数', '菜名'], how='left')
 
         # 保存单独菜品的重复率和连续排餐标识
-        sheet1_data = data[['日期', '菜名', '连续排餐标记', '重复比例']]
-
+        sheet1_data = data[['日期', '星期', '菜名', '连续排餐标记', '重复比例']]
+        # 确保 sheet1 中的日期只显示年月日
+        sheet1_data['日期'] = pd.to_datetime(sheet1_data['日期']).dt.strftime('%Y-%m-%d')
+        
         # 计算分类占比
         category_query = """SELECT 
             m.cook_date AS 日期,
@@ -489,6 +519,8 @@ def fetch_all_results_and_export():
             algorithm_test_dish d
         ON 
             m.dish_id = d.id
+        WHERE
+            m.plan_id = 3        
         GROUP BY 
             m.cook_date, d.category1
         ORDER BY 
@@ -521,7 +553,13 @@ def fetch_all_results_and_export():
         # 确保日期列一致
         category_summary['日期'] = pd.to_datetime(category_summary['日期'])
         cook_method_summary['日期'] = pd.to_datetime(cook_method_summary['日期'])
-        
+
+        # 确保日期列只显示年月日
+        data['日期'] = data['日期'].dt.strftime('%Y-%m-%d')
+        category_data['日期'] = category_data['日期'].dt.strftime('%Y-%m-%d')
+        category_summary['日期'] = category_summary['日期'].dt.strftime('%Y-%m-%d')
+        cook_method_summary['日期'] = cook_method_summary['日期'].dt.strftime('%Y-%m-%d')
+
         # 合并分类占比汇总和制作方式比例到主数据
         sheet2_data = pd.merge(category_summary[['日期', '分类占比汇总']], cook_method_summary, on='日期', how='left')
 
@@ -537,14 +575,24 @@ def fetch_all_results_and_export():
             algorithm_test_dish d
         ON 
             m.dish_id = d.id
+        WHERE
+            m.plan_id = 3
         GROUP BY 
             m.cook_date, d.category1, d.category2
         ORDER BY 
             日期, 菜品大类, 细化分类;"""
         detailed_data = pd.read_sql(detailed_query, connection)
+
+        # 确保日期列是 datetime 类型
+        detailed_data['日期'] = pd.to_datetime(detailed_data['日期'], errors='coerce')
+
+        # 按日期和菜品大类分组，并汇总细化分类
         detailed_summary = detailed_data.groupby(['日期', '菜品大类']).apply(
             lambda x: "，".join(f"{row['细化分类']}({row['分类数量']})" for _, row in x.iterrows())
         ).reset_index(name='细化分类汇总')
+
+        # 确保日期列只显示年月日
+        detailed_summary['日期'] = detailed_summary['日期'].dt.strftime('%Y-%m-%d')
 
         # 保存细化分类汇总到单独的 Sheet
         sheet3_data = detailed_summary
@@ -567,8 +615,9 @@ def fetch_all_results_and_export():
         if 'connection' in locals() and connection.open:
             connection.close()
             print("数据库连接已关闭。")
-
+            
+            
 if __name__ == "__main__":
     # fetch_data_and_export2()
     fetch_data_and_export3()
-    # fetch_all_results_and_export()
+    fetch_all_results_and_export()
