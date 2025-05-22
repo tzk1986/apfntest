@@ -11,7 +11,7 @@ db_config = {
 }
 
 # 全局参数化的 plan_id
-PLAN_ID = 3  # 默认值为 3，可根据需要修改
+PLAN_ID = 25080403  # 默认值为 3，可根据需要修改
 
 # 查看每天排餐菜品和重量数据
 query1 = f"""SELECT
@@ -696,8 +696,50 @@ def fetch_data_and_export7():
             connection.close()
             print("数据库连接已关闭。")
             
+def export_popular_rate_dish_count():
+    """
+    导出popular_rate不为0的菜品在排餐计划中的排餐次数
+    """
+    try:
+        connection = pymysql.connect(**db_config)
+        print("数据库连接成功！")
+
+        # 查询popular_rate不为0的菜品及其排餐次数
+        query = f"""
+        SELECT
+            d.dish_name AS 菜名,
+            d.popular_rate AS 热门度,
+            COUNT(m.id) AS 排餐次数
+        FROM
+            algorithm_test_dish d
+        INNER JOIN
+            algorithm_test_plan_item m ON d.id = m.dish_id
+        WHERE
+            d.popular_rate != 0
+            AND m.plan_id = {PLAN_ID}
+        GROUP BY
+            d.dish_name, d.popular_rate
+        ORDER BY
+            d.popular_rate DESC, 排餐次数 DESC
+        """
+        data = pd.read_sql(query, connection)
+
+        # 导出为 Excel 文件
+        output_file = r"d:\tangzk\py\seldom-web-testing\reports\popular_rate_dish_count.xlsx"
+        data.to_excel(output_file, index=False)
+        print(f"数据已成功导出到 {output_file}")
+
+    except Exception as e:
+        print(f"发生错误: {e}")
+
+    finally:
+        if 'connection' in locals() and connection.open:
+            connection.close()
+            print("数据库连接已关闭。")
+            
 if __name__ == "__main__":
     # fetch_data_and_export2()
     fetch_data_and_export3()
     # fetch_data_and_export7()
     fetch_all_results_and_export()
+    export_popular_rate_dish_count()
