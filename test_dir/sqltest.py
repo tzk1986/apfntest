@@ -72,8 +72,9 @@ class Config:
     # ========== 菜品不连续间隔天数（对应: 排餐参数标准化 - 9.菜品不连续间隔天数） ==========
     MIN_INTERVAL_DAYS: int = 1  # 同一菜品最低间隔出现天数（0=不限制, 1=至少间隔1天即不可连续）
 
-    # ========== 输出目录 ==========
+    # ========== 输出配置 ==========
     OUTPUT_DIR: str = r"d:\tangzk\py\seldom-web-testing\reports"
+    ENABLE_TIMESTAMP: bool = True  # 是否启用时间戳（防止文件覆盖）
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -142,11 +143,31 @@ def get_db_connection():
             logger.info("数据库连接已关闭")
 
 
-def get_output_path(filename: str) -> Path:
-    """获取输出文件完整路径"""
+def get_output_path(filename: str, plan_id: Optional[int] = None) -> Path:
+    """
+    获取输出文件完整路径
+
+    如果 ENABLE_TIMESTAMP=True，文件名会包含 plan_id 和时间戳，防止覆盖。
+    格式: {原名}_{plan_id}_{YYYYMMDD_HHMMSS}.xlsx
+    示例: output2_25080403_20260817_103015.xlsx
+    """
+    from datetime import datetime
+
     output_dir = Path(config.OUTPUT_DIR)
     output_dir.mkdir(parents=True, exist_ok=True)
-    return output_dir / filename
+
+    if config.ENABLE_TIMESTAMP:
+        # 拆分文件名和扩展名
+        name, ext = filename.rsplit(".", 1) if "." in filename else (filename, "")
+        # 获取plan_id（优先使用参数，否则用配置）
+        pid = plan_id or config.PLAN_ID
+        # 生成时间戳
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # 拼接新文件名
+        new_filename = f"{name}_{pid}_{timestamp}.{ext}" if ext else f"{name}_{pid}_{timestamp}"
+        return output_dir / new_filename
+    else:
+        return output_dir / filename
 
 
 def add_weekday_column(df: pd.DataFrame, date_col: str = "日期") -> pd.DataFrame:
@@ -521,7 +542,7 @@ def reverse_engineer_parameters(plan_id: Optional[int] = None) -> None:
     ================================================================================
     """
     plan_id = plan_id or config.PLAN_ID
-    output_file = get_output_path("parameter_verification.xlsx")
+    output_file = get_output_path("parameter_verification.xlsx", plan_id=plan_id)
 
     try:
         with get_db_connection() as conn:
@@ -1047,7 +1068,7 @@ def fetch_data_and_export2() -> None:
 
     输出文件: output2.xlsx
     """
-    output_file = get_output_path("output2.xlsx")
+    output_file = get_output_path("output2.xlsx", plan_id=config.PLAN_ID)
 
     try:
         with get_db_connection() as conn:
@@ -1072,7 +1093,7 @@ def fetch_data_and_export3() -> None:
 
     输出文件: output3.xlsx
     """
-    output_file = get_output_path("output3.xlsx")
+    output_file = get_output_path("output3.xlsx", plan_id=config.PLAN_ID)
 
     try:
         with get_db_connection() as conn:
@@ -1121,7 +1142,7 @@ def fetch_all_results_and_export(plan_id: Optional[int] = None) -> None:
     输出文件: output_all.xlsx
     """
     plan_id = plan_id or config.PLAN_ID
-    output_file = get_output_path("output_all.xlsx")
+    output_file = get_output_path("output_all.xlsx", plan_id=plan_id)
 
     try:
         with get_db_connection() as conn:
@@ -1197,7 +1218,7 @@ def fetch_data_and_export7() -> None:
 
     输出文件: output7.xlsx
     """
-    output_file = get_output_path("output7.xlsx")
+    output_file = get_output_path("output7.xlsx", plan_id=config.PLAN_ID)
 
     try:
         with get_db_connection() as conn:
@@ -1220,7 +1241,7 @@ def export_popular_rate_dish_count() -> None:
 
     输出文件: popular_rate_dish_count.xlsx
     """
-    output_file = get_output_path("popular_rate_dish_count.xlsx")
+    output_file = get_output_path("popular_rate_dish_count.xlsx", plan_id=config.PLAN_ID)
 
     try:
         with get_db_connection() as conn:
