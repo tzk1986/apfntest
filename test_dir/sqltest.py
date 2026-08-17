@@ -1,817 +1,558 @@
-import pymysql
+"""
+智能菜谱排餐数据查询与导出工具
+
+用于连接数据库查询智能菜谱生成后的排餐数据，生成对应的Excel报表，
+方便比对排餐结果与算法设置是否一致。
+"""
+
+import logging
+from contextlib import contextmanager
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+
 import pandas as pd
-'''
-用来连接数据库查找智能菜谱生成后的数据，生成对应的菜品数据execl，方便比对是否与设置一致
+import pymysql
 
-'''
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
-# 数据库连接配置
-db_config = {
-    "host": "10.50.11.77",
-    "user": "root",
-    "password": "!@#$%^@2021@epfly",
-    "database": "ifood_kitchen",  # 替换为你的数据库名称
-    "port": 3306,
+
+# ==================== 配置区域 ====================
+@dataclass(frozen=True)
+class Config:
+    """全局配置类"""
+
+    # 数据库配置
+    DB_HOST: str = "10.50.11.77"
+    DB_USER: str = "root"
+    DB_PASSWORD: str = "!@#$%^@2021@epfly"
+    DB_NAME: str = "ifood_kitchen"
+    DB_PORT: int = 3306
+
+    # 排餐计划ID
+    PLAN_ID: int = 25080403
+
+    # 标准值配置
+    STANDARD_WEIGHT: float = 350.0  # 标准人均消耗重量(g)
+    WEIGHT_TOLERANCE: float = 0.02  # 重量浮动比例
+    STANDARD_PRICE: float = 24.0  # 标准人均消费金额(元)
+    PRICE_TOLERANCE: float = 0.04  # 价格浮动比例
+
+    # 输出目录
+    OUTPUT_DIR: str = r"d:\tangzk\py\seldom-web-testing\reports"
+
+    @property
+    def db_config(self) -> dict:
+        """获取数据库连接配置"""
+        return {
+            "host": self.DB_HOST,
+            "user": self.DB_USER,
+            "password": self.DB_PASSWORD,
+            "database": self.DB_NAME,
+            "port": self.DB_PORT,
+        }
+
+
+# 全局配置实例
+config = Config()
+
+
+# ==================== 常量定义 ====================
+# 星期映射（英文 -> 中文）
+DAY_NAME_MAP = {
+    "Monday": "星期一",
+    "Tuesday": "星期二",
+    "Wednesday": "星期三",
+    "Thursday": "星期四",
+    "Friday": "星期五",
+    "Saturday": "星期六",
+    "Sunday": "星期日",
 }
 
-# 全局参数化的 plan_id
-PLAN_ID = 25080403  # 默认值为 3，可根据需要修改
-
-# 查看每天排餐菜品和重量数据
-query1 = f"""SELECT
-    m.cook_date AS 日期,
-    d.dish_name AS 菜名,
-    m.cook_weight AS 重量,
-    d.price AS 50克价格,
-    d.category1 AS 大类,
-    d.popular_flag AS 热门菜,
-    d.cook_method AS 制作方式 
-FROM
-    algorithm_test_dish d
-    INNER JOIN algorithm_test_plan_item m ON d.id = m.dish_id
-WHERE
-    m.plan_id = {PLAN_ID}
-ORDER BY
-    m.cook_date;"""
-
-# 每天排餐菜品的总重量和总价格
-query2 = f"""SELECT
-    m.cook_date AS 日期,
-    SUM( m.cook_weight ) AS 总重量,
-    SUM( ( m.cook_weight / 50 ) * d.price ) AS 总价格 
-FROM
-    algorithm_test_plan_item m
-    INNER JOIN algorithm_test_dish d ON m.dish_id = d.id
-WHERE
-    m.plan_id = {PLAN_ID}
-GROUP BY
-    m.cook_date 
-ORDER BY
-    日期;"""
-
-# 每天大类排餐的总重量
-query3 = f"""SELECT 
-    m.cook_date AS 日期,
-    d.category1 AS 菜品大类,
-    SUM(m.cook_weight) AS 分类总重量
-FROM 
-    algorithm_test_plan_item m
-INNER JOIN 
-    algorithm_test_dish d
-ON 
-    m.dish_id = d.id
-WHERE
-    m.plan_id = {PLAN_ID}
-GROUP BY 
-    m.cook_date, d.category1
-ORDER BY 
-    日期, 菜品大类;"""
+# 预估用餐人数（按星期）
+ESTIMATED_PEOPLE = {
+    "星期一": 300,
+    "星期二": 280,
+    "星期三": 280,
+    "星期四": 280,
+    "星期五": 250,
+}
 
 
-# 导出文件路径
-output_file1 = r"d:\tangzk\py\seldom-web-testing\reports\output1.xlsx"
-output_file2 = r"d:\tangzk\py\seldom-web-testing\reports\output2.xlsx"
-output_file3 = r"d:\tangzk\py\seldom-web-testing\reports\output3.xlsx"
-output_file4 = r"d:\tangzk\py\seldom-web-testing\reports\output4.xlsx"
-output_file5 = r"d:\tangzk\py\seldom-web-testing\reports\output5.xlsx"
-output_file6 = r"d:\tangzk\py\seldom-web-testing\reports\output6.xlsx"
-output_all = r"d:\tangzk\py\seldom-web-testing\reports\output_all.xlsx"
-output_file7 = r"d:\tangzk\py\seldom-web-testing\reports\output7.xlsx"
-
-# def fetch_data_and_export1():
-#     """
-#     查询每天排餐菜品和重量数据，并导出为 Excel 文件
-#     """
-#     try:
-#         # 连接数据库
-#         connection = pymysql.connect(**db_config)
-#         print("数据库连接成功！")
-
-#         # 执行查询
-#         data = pd.read_sql(query1, connection)
-#         # 根据日期字段添加星期几列
-#         if '日期' in data.columns:
-#             data['星期'] = pd.to_datetime(data['日期']).dt.day_name()
-#         else:
-#             print("警告: 数据中未找到 '排餐日期' 列，无法添加星期信息。")
-
-#         # 导出为 Excel 文件
-#         data.to_excel(output_file1, index=False)
-#         print(f"数据已成功导出到 {output_file1}")
-
-
-#     except Exception as e:
-#         print(f"发生错误: {e}")
-
-#     finally:
-#         # 确保关闭数据库连接
-#         if 'connection' in locals() and connection.open:
-#             connection.close()
-#             print("数据库连接已关闭。")
-
-
-def fetch_data_and_export2():
-    """
-    查询每天排餐菜品的总重量和总价格，并添加人均消耗菜品重量和人均消费金额列
-    """
+# ==================== 工具函数 ====================
+@contextmanager
+def get_db_connection():
+    """数据库连接上下文管理器"""
+    connection = None
     try:
-        # 连接数据库
-        connection = pymysql.connect(**db_config)
-        print("数据库连接成功！")
-
-        # 执行查询
-        data = pd.read_sql(query2, connection)
-
-        # 根据日期字段添加星期几列
-        if "日期" in data.columns:
-            data["星期"] = pd.to_datetime(data["日期"]).dt.day_name()
-        else:
-            print("警告: 数据中未找到 '排餐日期' 列，无法添加星期信息。")
-
-        # 预估人数映射（星期一到星期五不同）
-        estimated_people = {
-            "Monday": 300,
-            "Tuesday": 280,
-            "Wednesday": 280,
-            "Thursday": 280,
-            "Friday": 250,
-        }
-
-        # 添加人均消耗菜品重量和人均消费金额列
-        data["预估人数"] = data["星期"].map(estimated_people)
-        data["人均消耗重量"] = data["总重量"] / data["预估人数"]
-        data["人均消费金额"] = data["总价格"] / data["预估人数"]
-
-        # 导出为 Excel 文件
-        data.to_excel(output_file2, index=False)
-        print(f"数据已成功导出到 {output_file2}")
-
-    except Exception as e:
-        print(f"发生错误: {e}")
-
+        connection = pymysql.connect(**config.db_config)
+        logger.info("数据库连接成功")
+        yield connection
     finally:
-        # 确保关闭数据库连接
-        if "connection" in locals() and connection.open:
+        if connection and connection.open:
             connection.close()
-            print("数据库连接已关闭。")
+            logger.info("数据库连接已关闭")
 
 
-def fetch_data_and_export3():
+def get_output_path(filename: str) -> Path:
+    """获取输出文件完整路径"""
+    output_dir = Path(config.OUTPUT_DIR)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir / filename
+
+
+def add_weekday_column(df: pd.DataFrame, date_col: str = "日期") -> pd.DataFrame:
+    """添加中文星期列"""
+    if date_col not in df.columns:
+        logger.warning(f"数据中未找到 '{date_col}' 列，无法添加星期信息")
+        return df
+
+    df = df.copy()
+    df["星期"] = pd.to_datetime(df[date_col]).dt.day_name().map(DAY_NAME_MAP)
+    return df
+
+
+def add_estimated_people_column(df: pd.DataFrame) -> pd.DataFrame:
+    """添加预估人数列"""
+    df = df.copy()
+    df["预估人数"] = df["星期"].map(ESTIMATED_PEOPLE)
+    return df
+
+
+def build_plan_query(plan_id: Optional[int] = None) -> str:
+    """构建带plan_id过滤的SQL条件"""
+    plan_id = plan_id or config.PLAN_ID
+    return f"m.plan_id = {plan_id}"
+
+
+# ==================== SQL查询模板 ====================
+def get_query1(plan_id: Optional[int] = None) -> str:
+    """查询1：每天排餐菜品和重量数据"""
+    plan_condition = build_plan_query(plan_id)
+    return f"""SELECT
+        m.cook_date AS 日期,
+        d.dish_name AS 菜名,
+        m.cook_weight AS 重量,
+        d.price AS 50克价格,
+        d.category1 AS 大类,
+        d.popular_flag AS 热门菜,
+        d.cook_method AS 制作方式
+    FROM
+        algorithm_test_dish d
+        INNER JOIN algorithm_test_plan_item m ON d.id = m.dish_id
+    WHERE
+        {plan_condition}
+    ORDER BY
+        m.cook_date;"""
+
+
+def get_query2(plan_id: Optional[int] = None) -> str:
+    """查询2：每天排餐菜品的总重量和总价格"""
+    plan_condition = build_plan_query(plan_id)
+    return f"""SELECT
+        m.cook_date AS 日期,
+        SUM(m.cook_weight) AS 总重量,
+        SUM((m.cook_weight / 50) * d.price) AS 总价格
+    FROM
+        algorithm_test_plan_item m
+        INNER JOIN algorithm_test_dish d ON m.dish_id = d.id
+    WHERE
+        {plan_condition}
+    GROUP BY
+        m.cook_date
+    ORDER BY
+        日期;"""
+
+
+def get_query3(plan_id: Optional[int] = None) -> str:
+    """查询3：每天大类排餐的总重量"""
+    plan_condition = build_plan_query(plan_id)
+    return f"""SELECT
+        m.cook_date AS 日期,
+        d.category1 AS 菜品大类,
+        SUM(m.cook_weight) AS 分类总重量
+    FROM
+        algorithm_test_plan_item m
+        INNER JOIN algorithm_test_dish d ON m.dish_id = d.id
+    WHERE
+        {plan_condition}
+    GROUP BY
+        m.cook_date, d.category1
+    ORDER BY
+        日期, 菜品大类;"""
+
+
+def get_category_query(plan_id: Optional[int] = None) -> str:
+    """分类占比查询"""
+    plan_condition = build_plan_query(plan_id)
+    return f"""SELECT
+        m.cook_date AS 日期,
+        d.category1 AS 菜品大类,
+        SUM(m.cook_weight) AS 分类总重量
+    FROM
+        algorithm_test_plan_item m
+        INNER JOIN algorithm_test_dish d ON m.dish_id = d.id
+    WHERE
+        {plan_condition}
+    GROUP BY
+        m.cook_date, d.category1
+    ORDER BY
+        日期, 菜品大类;"""
+
+
+def get_detailed_category_query(plan_id: Optional[int] = None) -> str:
+    """细化分类查询"""
+    plan_condition = build_plan_query(plan_id)
+    return f"""SELECT
+        m.cook_date AS 日期,
+        d.category1 AS 菜品大类,
+        d.category2 AS 细化分类,
+        COUNT(d.id) AS 分类数量
+    FROM
+        algorithm_test_plan_item m
+        INNER JOIN algorithm_test_dish d ON m.dish_id = d.id
+    WHERE
+        {plan_condition}
+    GROUP BY
+        m.cook_date, d.category1, d.category2
+    ORDER BY
+        日期, 菜品大类, 细化分类;"""
+
+
+def get_popular_rate_query(plan_id: Optional[int] = None) -> str:
+    """热门度与排餐次数查询"""
+    plan_condition = build_plan_query(plan_id)
+    return f"""SELECT
+        d.dish_name AS 菜名,
+        d.popular_rate AS 热门度,
+        COUNT(m.id) AS 排餐次数
+    FROM
+        algorithm_test_dish d
+        INNER JOIN algorithm_test_plan_item m ON d.id = m.dish_id
+    WHERE
+        d.popular_rate != 0
+        AND {plan_condition}
+    GROUP BY
+        d.dish_name, d.popular_rate
+    ORDER BY
+        d.popular_rate DESC, 排餐次数 DESC;"""
+
+
+# ==================== 数据处理函数 ====================
+def calculate_category_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """计算分类占比汇总"""
+    df = df.copy()
+    df["日期"] = pd.to_datetime(df["日期"])
+
+    total_weight = df.groupby("日期")["分类总重量"].transform("sum")
+    df["分类占比"] = (df["分类总重量"] / total_weight * 100).round(2)
+
+    summary = df.pivot(index="日期", columns="菜品大类", values="分类占比").fillna(0)
+    summary["分类占比汇总"] = summary.apply(
+        lambda row: "（大荤:小荤:素菜）："
+        + ":".join(f"{row.get(cat, 0):.2f}%" for cat in ["大荤", "小荤", "素菜"]),
+        axis=1,
+    )
+    return summary.reset_index()[["日期", "分类占比汇总"]]
+
+
+def calculate_cook_method_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """计算制作方式比例"""
+    df = df.copy()
+    summary = df.groupby(["日期", "制作方式"]).size().unstack(fill_value=0)
+
+    summary["制作方式比例"] = summary.apply(
+        lambda row: "（炒菜机:蒸烤箱:人工）：" + ":".join(row.astype(str)),
+        axis=1,
+    )
+    return summary.reset_index()[["日期", "制作方式比例"]]
+
+
+def calculate_hot_dish_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """计算热门菜统计"""
+    df = df.copy()
+    hot_data = df[df["热门菜"] == "是"]
+
+    hot_summary = (
+        hot_data.groupby(["日期", "大类"]).size().reset_index(name="热门菜数量")
+    )
+    hot_summary["热门菜统计"] = hot_summary.apply(
+        lambda row: f"{row['大类']}（{int(row['热门菜数量'])}）", axis=1
+    )
+
+    result = (
+        hot_summary.groupby("日期")["热门菜统计"]
+        .apply(lambda x: "，".join(x))
+        .reset_index(name="每日热门菜统计")
+    )
+    return result
+
+
+def calculate_weight_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    """计算重量相关分析指标"""
+    df = df.copy()
+    standard_weight = config.STANDARD_WEIGHT
+    tolerance = config.WEIGHT_TOLERANCE
+
+    low = standard_weight * (1 - tolerance)
+    high = standard_weight * (1 + tolerance)
+
+    df["重量浮动范围"] = f"{low:.2f}-{high:.2f}"
+    df["重量浮动值"] = (df["人均消耗重量"] - standard_weight).round(2)
+    df["重量是否在范围内"] = df["人均消耗重量"].apply(
+        lambda x: "在范围内" if low <= x <= high else "超出范围"
+    )
+    return df
+
+
+def calculate_price_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    """计算价格相关分析指标"""
+    df = df.copy()
+    standard_price = config.STANDARD_PRICE
+    tolerance = config.PRICE_TOLERANCE
+
+    low = standard_price * (1 - tolerance)
+    high = standard_price * (1 + tolerance)
+
+    df["价格浮动范围"] = f"{low:.2f}-{high:.2f}"
+    df["价格浮动值"] = (df["人均消费金额"] - standard_price).round(2)
+    df["价格是否在范围内"] = df["人均消费金额"].apply(
+        lambda x: "在范围内" if low <= x <= high else "超出范围"
+    )
+    return df
+
+
+def calculate_repetition_rate(df: pd.DataFrame) -> pd.DataFrame:
+    """计算菜品重复排餐比例"""
+    df = df.copy()
+    df["周数"] = df["日期"].dt.isocalendar().week
+
+    weekly_counts = df.groupby(["周数", "菜名"]).size().reset_index(name="排餐次数")
+    weekly_counts["重复次数"] = (weekly_counts["排餐次数"] - 1).clip(lower=0)
+
+    total_per_week = weekly_counts.groupby("周数")["排餐次数"].transform("sum")
+    weekly_counts["重复比例"] = (weekly_counts["重复次数"] / total_per_week).round(4)
+
+    df = pd.merge(
+        df,
+        weekly_counts[["周数", "菜名", "重复比例"]],
+        on=["周数", "菜名"],
+        how="left",
+    )
+    return df
+
+
+def check_consecutive_meals(df: pd.DataFrame) -> pd.DataFrame:
+    """检查连续排餐标记"""
+    df = df.copy()
+    df["日期"] = pd.to_datetime(df["日期"])
+    df = df.sort_values(by=["菜名", "日期"])
+    df["连续排餐标记"] = (
+        (df["菜名"] == df["菜名"].shift(1))
+        & (df["日期"] - df["日期"].shift(1) == pd.Timedelta(days=1))
+    ).astype(int)
+    return df
+
+
+# ==================== 主要导出函数 ====================
+def fetch_data_and_export2() -> None:
     """
     查询每天排餐菜品的总重量和总价格，并添加人均消耗菜品重量和人均消费金额列
-    以及每天菜品分类占比汇总
+
+    输出文件: output2.xlsx
     """
+    output_file = get_output_path("output2.xlsx")
+
     try:
-        # 连接数据库
-        connection = pymysql.connect(**db_config)
-        print("数据库连接成功！")
+        with get_db_connection() as conn:
+            data = pd.read_sql(get_query2(), conn)
 
-        # 执行查询
-        data = pd.read_sql(query2, connection)
+        data = add_weekday_column(data)
+        data = add_estimated_people_column(data)
 
-        # 根据日期字段添加星期几列
-        if "日期" in data.columns:
-            data["星期"] = pd.to_datetime(data["日期"]).dt.day_name()
-        else:
-            print("警告: 数据中未找到 '日期' 列，无法添加星期信息。")
-
-        # 将星期几的英文转换为中文
-        day_name_map = {
-            "Monday": "星期一",
-            "Tuesday": "星期二",
-            "Wednesday": "星期三",
-            "Thursday": "星期四",
-            "Friday": "星期五",
-            "Saturday": "星期六",
-            "Sunday": "星期日",
-        }
-        data["星期"] = data["星期"].map(day_name_map)
-
-        # 预估人数映射（星期一到星期五不同）
-        estimated_people = {
-            "星期一": 300,
-            "星期二": 280,
-            "星期三": 280,
-            "星期四": 280,
-            "星期五": 250,
-        }
-
-        # 添加人均消耗菜品重量和人均消费金额列
-        data["预估人数"] = data["星期"].map(estimated_people)
         data["人均消耗重量"] = (data["总重量"] / data["预估人数"]).round(2)
-
-        # 确保总价格保留两位小数
-        data["总价格"] = data["总价格"].round(2)
-
-        # 标准值和浮动比例
-        standard_weight = 350  # 标准人均消耗重量
-        weight_tolerance = 0.02  # 浮动比例
-        standard_price = 24  # 标准人均消费金额
-        price_tolerance = 0.04  # 浮动比例
-
-        # 计算人均消耗重量浮动范围和浮动值
-        data["重量浮动范围"] = data.apply(
-            lambda row: f"{(standard_weight * (1 - weight_tolerance)):.2f}-{(standard_weight * (1 + weight_tolerance)):.2f}",
-            axis=1,
-        )
-        data["重量浮动值"] = (data["人均消耗重量"] - standard_weight).round(2)
-        data["重量是否在范围内"] = data["人均消耗重量"].apply(
-            lambda x: (
-                "在范围内"
-                if standard_weight * (1 - weight_tolerance)
-                <= x
-                <= standard_weight * (1 + weight_tolerance)
-                else "超出范围"
-            )
-        )
-
         data["人均消费金额"] = (data["总价格"] / data["预估人数"]).round(2)
-        # 计算人均消费金额浮动范围和浮动值
-        data["价格浮动范围"] = data.apply(
-            lambda row: f"{(standard_price * (1 - price_tolerance)):.2f}-{(standard_price * (1 + price_tolerance)):.2f}",
-            axis=1,
-        )
-        data["价格浮动值"] = (data["人均消费金额"] - standard_price).round(2)
-        data["价格是否在范围内"] = data["人均消费金额"].apply(
-            lambda x: (
-                "在范围内"
-                if standard_price * (1 - price_tolerance)
-                <= x
-                <= standard_price * (1 + price_tolerance)
-                else "超出范围"
-            )
-        )
 
-        # 查询每天菜品分类的总重量
-        category_query = """SELECT 
-            m.cook_date AS 日期,
-            d.category1 AS 菜品大类,
-            SUM(m.cook_weight) AS 分类总重量
-        FROM 
-            algorithm_test_plan_item m
-        INNER JOIN 
-            algorithm_test_dish d
-        ON 
-            m.dish_id = d.id
-        GROUP BY 
-            m.cook_date, d.category1  -- 按日期和大类双重分组
-        ORDER BY 
-            日期, 菜品大类;"""  # 替换为你的查询语句
-
-        category_data = pd.read_sql(category_query, connection)
-
-        # 计算每天各分类的占比
-        total_weight_per_day = category_data.groupby("日期")["分类总重量"].transform(
-            "sum"
-        )
-        category_data["分类占比"] = (
-            category_data["分类总重量"] / total_weight_per_day * 100
-        ).round(2)
-
-        # 格式化分类占比为字符串
-        category_summary = category_data.pivot(
-            index="日期", columns="菜品大类", values="分类占比"
-        ).fillna(0)
-        category_summary["分类占比汇总"] = category_summary.apply(
-            lambda row: "（大荤:小荤:素菜）："
-            + ":".join(f"{row.get(cat, 0):.2f}%" for cat in ["大荤", "小荤", "素菜"]),
-            axis=1,
-        )
-        category_summary = category_summary.reset_index()[["日期", "分类占比汇总"]]
-
-        # 合并分类占比汇总到主数据
-        data = pd.merge(data, category_summary, on="日期", how="left")
-
-        # 使用 query1 查询热门菜数据
-        hot_dish_data = pd.read_sql(query1, connection)
-
-        # 筛选热门菜为“是”的数据
-        hot_dish_data = hot_dish_data[hot_dish_data["热门菜"] == "是"]
-
-        # 按日期和大类统计热门菜数量
-        hot_dish_summary = (
-            hot_dish_data.groupby(["日期", "大类"])
-            .size()
-            .reset_index(name="热门菜数量")
-        )
-
-        # 格式化热门菜数量为字符串
-        hot_dish_summary["热门菜统计"] = hot_dish_summary.apply(
-            lambda row: f"{row['大类']}（{int(row['热门菜数量'])}）", axis=1
-        )
-
-        # 按日期汇总热门菜统计
-        hot_summary = (
-            hot_dish_summary.groupby("日期")["热门菜统计"]
-            .apply(lambda x: "，".join(x))
-            .reset_index(name="每日热门菜统计")
-        )
-
-        # 合并热门菜统计到主数据
-        data = pd.merge(data, hot_summary, on="日期", how="left")
-
-        # 使用 query1 查询制作方式数据
-        cook_method_data = pd.read_sql(query1, connection)
-
-        # 按日期和制作方式统计数量
-        cook_method_summary = (
-            cook_method_data.groupby(["日期", "制作方式"]).size().unstack(fill_value=0)
-        )
-
-        # 格式化制作方式比例为字符串
-        cook_method_summary["制作方式比例"] = cook_method_summary.apply(
-            lambda row: "（炒菜机:蒸烤箱:人工）：" + ":".join(row.astype(str)), axis=1
-        )
-        cook_method_summary = cook_method_summary.reset_index()[
-            ["日期", "制作方式比例"]
-        ]
-
-        # 合并制作方式比例到主数据
-        data = pd.merge(data, cook_method_summary, on="日期", how="left")
-
-        # 导出为 Excel 文件
-        data.to_excel(output_file3, index=False)
-        print(f"数据已成功导出到 {output_file3}")
+        data.to_excel(output_file, index=False)
+        logger.info(f"数据已成功导出到 {output_file}")
 
     except Exception as e:
-        print(f"发生错误: {e}")
-
-    finally:
-        # 确保关闭数据库连接
-        if "connection" in locals() and connection.open:
-            connection.close()
-            print("数据库连接已关闭。")
+        logger.error(f"发生错误: {e}")
 
 
-# def fetch_data_and_export4():
-#     """
-#     查询每天排餐数据是否有同一个菜品连续两天排餐
-#     并导出为 Excel 文件
-#     """
-#     try:
-#         # 连接数据库
-#         connection = pymysql.connect(**db_config)
-#         print("数据库连接成功！")
-
-#         # 执行查询
-#         data = pd.read_sql(query1, connection)
-
-#         # 根据日期字段添加星期几列
-#         if '日期' in data.columns:
-#             data['星期'] = pd.to_datetime(data['日期']).dt.day_name()
-#         else:
-#             print("警告: 数据中未找到 '日期' 列，无法添加星期信息。")
-
-#         # 验证同一个菜品是否连续两天排餐
-#         data['日期'] = pd.to_datetime(data['日期'])
-#         data.sort_values(by=['菜名', '日期'], inplace=True)
-#         data['连续排餐标记'] = (
-#             (data['菜名'] == data['菜名'].shift(1)) &
-#             (data['日期'] - data['日期'].shift(1) == pd.Timedelta(days=1))
-#         ).astype(int)
-
-#         # 导出为 Excel 文件
-#         data.to_excel(output_file4, index=False)
-#         print(f"数据已成功导出到 {output_file4}")
-
-#     except Exception as e:
-#         print(f"发生错误: {e}")
-
-#     finally:
-#         # 确保关闭数据库连接
-#         if 'connection' in locals() and connection.open:
-#             connection.close()
-#             print("数据库连接已关闭。")
-
-# def fetch_data_and_export5():
-
-#     try:
-#         # 连接数据库
-#         connection = pymysql.connect(**db_config)
-#         print("数据库连接成功！")
-
-#         # 执行查询
-#         data = pd.read_sql(query2, connection)
-
-#         # 根据日期字段添加星期几列
-#         if '日期' in data.columns:
-#             data['星期'] = pd.to_datetime(data['日期']).dt.day_name()
-#         else:
-#             print("警告: 数据中未找到 '日期' 列，无法添加星期信息。")
-
-#         # 查询每天菜品分类的总重量和数量
-#         category_query = """SELECT
-#             m.cook_date AS 日期,
-#             d.category1 AS 菜品大类,
-#             d.category2 AS 细化分类,
-#             COUNT(d.id) AS 分类数量,
-#             SUM(m.cook_weight) AS 分类总重量
-#         FROM
-#             algorithm_test_plan_item m
-#         INNER JOIN
-#             algorithm_test_dish d
-#         ON
-#             m.dish_id = d.id
-#         GROUP BY
-#             m.cook_date, d.category1, d.category2
-#         ORDER BY
-#             日期, 菜品大类, 细化分类;"""  # 替换为你的查询语句
-
-#         category_data = pd.read_sql(category_query, connection)
-
-#         # 计算每天各分类的占比
-#         total_weight_per_day = category_data.groupby('日期')['分类总重量'].transform('sum')
-#         category_data['分类占比'] = (category_data['分类总重量'] / total_weight_per_day * 100).round(2)
-#         category_data['分类占比'] = category_data['分类占比'].astype(str) + "%"
-
-#         # 统计每天各大类的数量和细化分类
-#         category_summary = category_data.groupby('日期').apply(
-#             lambda x: "；".join(
-#                 f"{row['菜品大类']}({row['分类数量']}): {row['分类占比']}" for _, row in x.iterrows()
-#             )
-#         ).reset_index(name='分类数量和比例')
-
-#         # 统计每个大类包含的细化分类及其数量比例
-#         detailed_summary = category_data.groupby(['日期', '菜品大类', '细化分类']).apply(
-#             lambda x: f"{x['细化分类'].iloc[0]}({x['分类数量'].sum()})"
-#         ).reset_index(name='细化分类数量')
-
-#         # 汇总细化分类为字符串
-#         detailed_summary_grouped = detailed_summary.groupby(['日期', '菜品大类']).apply(
-#             lambda x: "，".join(x['细化分类数量'])
-#         ).reset_index(name='细化分类汇总')
-
-#         # 合并分类数量和比例到主数据
-#         data = pd.merge(data, category_summary, on='日期', how='left')
-
-#         # 合并细化分类汇总到主数据
-#         detailed_summary_pivot = detailed_summary_grouped.pivot(index='日期', columns='菜品大类', values='细化分类汇总')
-#         for category in ['大荤', '小荤', '素菜']:
-#             data[f'{category}细化分类'] = data['日期'].map(detailed_summary_pivot.get(category, {}))
-
-#         # 导出为 Excel 文件
-#         data.to_excel(output_file5, index=False)
-#         print(f"数据已成功导出到 {output_file5}")
-
-#     except Exception as e:
-#         print(f"发生错误: {e}")
-
-#     finally:
-#         # 确保关闭数据库连接
-#         if 'connection' in locals() and connection.open:
-#             connection.close()
-#             print("数据库连接已关闭。")
-
-# def fetch_data_and_export6():
-
-#     try:
-#         # 连接数据库
-#         connection = pymysql.connect(**db_config)
-#         print("数据库连接成功！")
-
-#         # 执行查询
-#         data = pd.read_sql(query1, connection)
-
-#         # 确保日期列存在并转换为 datetime 类型
-#         if '日期' in data.columns:
-#             data['日期'] = pd.to_datetime(data['日期'])
-#         else:
-#             raise KeyError("数据中未找到 '日期' 列，请检查查询结果。")
-
-#         # 计算每个菜品在一周中的排餐次数
-#         data['周数'] = data['日期'].dt.isocalendar().week  # 获取周数
-#         weekly_counts = data.groupby(['周数', '菜名']).size().reset_index(name='排餐次数')
-
-#         # 计算重复排餐次数
-#         weekly_counts['重复次数'] = weekly_counts['排餐次数'] - 1
-#         weekly_counts['重复次数'] = weekly_counts['重复次数'].clip(lower=0)  # 确保重复次数不为负数
-
-#         # 计算重复比例
-#         total_meals_per_week = weekly_counts.groupby('周数')['排餐次数'].transform('sum')
-#         weekly_counts['重复比例'] = (weekly_counts['重复次数'] / total_meals_per_week).round(4)
-
-#         # 合并重复比例到主数据
-#         data = pd.merge(data, weekly_counts[['周数', '菜名', '重复比例']], on=['周数', '菜名'], how='left')
-
-#         # 导出为 Excel 文件
-#         data.to_excel(output_file6, index=False)
-#         print(f"数据已成功导出到 {output_file6}")
-
-#     except KeyError as e:
-#         print(f"关键列缺失: {e}")
-#     except Exception as e:
-#         print(f"发生错误: {e}")
-
-#     finally:
-#         # 确保关闭数据库连接
-#         if 'connection' in locals() and connection.open:
-#             connection.close()
-#             print("数据库连接已关闭。")
-
-
-def fetch_all_results_and_export(PLAN_ID=PLAN_ID):
+def fetch_data_and_export3() -> None:
     """
-    查看菜品是否连续排餐，以及菜品重复排餐比例
-    查看每天排餐大类重量比例，以及细化分类数量
-    执行多个查询并将结果导出到多个 Excel Sheet
+    综合分析：人均消耗+浮动校验+分类占比+热门菜+制作方式
+
+    输出文件: output3.xlsx
     """
+    output_file = get_output_path("output3.xlsx")
+
     try:
-        # 连接数据库
-        connection = pymysql.connect(**db_config)
-        print("数据库连接成功！")
+        with get_db_connection() as conn:
+            # 查询基础数据
+            data = pd.read_sql(get_query2(), conn)
+            data = add_weekday_column(data)
+            data = add_estimated_people_column(data)
 
-        # 执行查询
-        data = pd.read_sql(query1, connection)
+            # 计算人均值
+            data["人均消耗重量"] = (data["总重量"] / data["预估人数"]).round(2)
+            data["总价格"] = data["总价格"].round(2)
+            data["人均消费金额"] = (data["总价格"] / data["预估人数"]).round(2)
 
-        # 确保日期列存在并转换为 datetime 类型
-        if "日期" in data.columns:
+            # 计算浮动分析
+            data = calculate_weight_analysis(data)
+            data = calculate_price_analysis(data)
+
+            # 分类占比汇总
+            category_data = pd.read_sql(get_category_query(), conn)
+            category_summary = calculate_category_summary(category_data)
+            data = pd.merge(data, category_summary, on="日期", how="left")
+
+            # 热门菜统计
+            query1_data = pd.read_sql(get_query1(), conn)
+            hot_summary = calculate_hot_dish_summary(query1_data)
+            data = pd.merge(data, hot_summary, on="日期", how="left")
+
+            # 制作方式比例
+            cook_summary = calculate_cook_method_summary(query1_data)
+            data = pd.merge(data, cook_summary, on="日期", how="left")
+
+        data.to_excel(output_file, index=False)
+        logger.info(f"数据已成功导出到 {output_file}")
+
+    except Exception as e:
+        logger.error(f"发生错误: {e}")
+
+
+def fetch_all_results_and_export(plan_id: Optional[int] = None) -> None:
+    """
+    完整分析：多Sheet导出
+    - Sheet1: 菜品重复率与连续排餐
+    - Sheet2: 分类比例与制作方式
+    - Sheet3: 细化分类汇总
+
+    输出文件: output_all.xlsx
+    """
+    plan_id = plan_id or config.PLAN_ID
+    output_file = get_output_path("output_all.xlsx")
+
+    try:
+        with get_db_connection() as conn:
+            # 查询基础数据
+            data = pd.read_sql(get_query1(plan_id), conn)
             data["日期"] = pd.to_datetime(data["日期"])
-        else:
-            raise KeyError("数据中未找到 '日期' 列，请检查查询结果。")
 
-        # 添加星期列
-        data["星期"] = data["日期"].dt.day_name()
+            # 添加星期列
+            data = add_weekday_column(data)
 
-        # 将星期几的英文转换为中文
-        day_name_map = {
-            "Monday": "星期一",
-            "Tuesday": "星期二",
-            "Wednesday": "星期三",
-            "Thursday": "星期四",
-            "Friday": "星期五",
-            "Saturday": "星期六",
-            "Sunday": "星期日",
-        }
-        data["星期"] = data["星期"].map(day_name_map)
+            # 检查连续排餐
+            data = check_consecutive_meals(data)
 
-        # 验证连续排餐
-        data.sort_values(by=["菜名", "日期"], inplace=True)
-        data["连续排餐标记"] = (
-            (data["菜名"] == data["菜名"].shift(1))
-            & (data["日期"] - data["日期"].shift(1) == pd.Timedelta(days=1))
-        ).astype(int)
+            # 计算重复比例
+            data = calculate_repetition_rate(data)
 
-        # 计算重复比例
-        data["周数"] = data["日期"].dt.isocalendar().week
-        weekly_counts = (
-            data.groupby(["周数", "菜名"]).size().reset_index(name="排餐次数")
-        )
-        weekly_counts["重复次数"] = weekly_counts["排餐次数"] - 1
-        weekly_counts["重复次数"] = weekly_counts["重复次数"].clip(lower=0)
-        total_meals_per_week = weekly_counts.groupby("周数")["排餐次数"].transform(
-            "sum"
-        )
-        weekly_counts["重复比例"] = (
-            weekly_counts["重复次数"] / total_meals_per_week
-        ).round(4)
-        data = pd.merge(
-            data,
-            weekly_counts[["周数", "菜名", "重复比例"]],
-            on=["周数", "菜名"],
-            how="left",
-        )
+            # Sheet1数据
+            sheet1_data = data[["日期", "星期", "菜名", "重量", "连续排餐标记", "重复比例"]].copy()
+            sheet1_data["日期"] = sheet1_data["日期"].dt.strftime("%Y-%m-%d")
 
-        # 保存单独菜品的重复率和连续排餐标识
-        sheet1_data = data[["日期", "星期", "菜名", "重量", "连续排餐标记", "重复比例"]]
-        # 确保 sheet1 中的日期只显示年月日
-        sheet1_data["日期"] = pd.to_datetime(sheet1_data["日期"]).dt.strftime(
-            "%Y-%m-%d"
-        )
+            # 分类占比
+            category_data = pd.read_sql(get_category_query(plan_id), conn)
+            category_summary = calculate_category_summary(category_data)
 
-        # 计算分类占比
-        category_query = f"""SELECT 
-            m.cook_date AS 日期,
-            d.category1 AS 菜品大类,
-            SUM(m.cook_weight) AS 分类总重量
-        FROM 
-            algorithm_test_plan_item m
-        INNER JOIN 
-            algorithm_test_dish d
-        ON 
-            m.dish_id = d.id
-        WHERE
-            m.plan_id = {PLAN_ID}        
-        GROUP BY 
-            m.cook_date, d.category1
-        ORDER BY 
-            日期, 菜品大类;"""
-        category_data = pd.read_sql(category_query, connection)
-        category_data["日期"] = pd.to_datetime(category_data["日期"])
-        total_weight_per_day = category_data.groupby("日期")["分类总重量"].transform(
-            "sum"
-        )
-        category_data["分类占比"] = (
-            category_data["分类总重量"] / total_weight_per_day * 100
-        ).round(2)
+            # 制作方式比例
+            cook_summary = calculate_cook_method_summary(data)
 
-        # 格式化分类占比为字符串
-        category_summary = category_data.pivot(
-            index="日期", columns="菜品大类", values="分类占比"
-        ).fillna(0)
-        category_summary["分类占比汇总"] = category_summary.apply(
-            lambda row: "（大荤:小荤:素菜）："
-            + ":".join(f"{row.get(cat, 0):.2f}%" for cat in ["大荤", "小荤", "素菜"]),
-            axis=1,
-        )
-        category_summary = category_summary.reset_index()
+            # 统一日期格式
+            category_summary["日期"] = pd.to_datetime(category_summary["日期"]).dt.strftime("%Y-%m-%d")
+            cook_summary["日期"] = pd.to_datetime(cook_summary["日期"]).dt.strftime("%Y-%m-%d")
 
-        # 使用 query1 查询制作方式数据
-        cook_method_data = pd.read_sql(query1, connection)
-
-        # 按日期和制作方式统计数量
-        cook_method_summary = (
-            cook_method_data.groupby(["日期", "制作方式"]).size().unstack(fill_value=0)
-        )
-
-        # 格式化制作方式比例为字符串
-        cook_method_summary["制作方式比例"] = cook_method_summary.apply(
-            lambda row: "（炒菜机:蒸烤箱:人工）：" + ":".join(row.astype(str)), axis=1
-        )
-        cook_method_summary = cook_method_summary.reset_index()[
-            ["日期", "制作方式比例"]
-        ]
-
-        # 确保日期列一致
-        category_summary["日期"] = pd.to_datetime(category_summary["日期"])
-        cook_method_summary["日期"] = pd.to_datetime(cook_method_summary["日期"])
-
-        # 确保日期列只显示年月日
-        data["日期"] = data["日期"].dt.strftime("%Y-%m-%d")
-        category_data["日期"] = category_data["日期"].dt.strftime("%Y-%m-%d")
-        category_summary["日期"] = category_summary["日期"].dt.strftime("%Y-%m-%d")
-        cook_method_summary["日期"] = cook_method_summary["日期"].dt.strftime(
-            "%Y-%m-%d"
-        )
-
-        # 合并分类占比汇总和制作方式比例到主数据
-        sheet2_data = pd.merge(
-            category_summary[["日期", "分类占比汇总"]],
-            cook_method_summary,
-            on="日期",
-            how="left",
-        )
-
-        # 计算细化分类
-        detailed_query = f"""SELECT 
-            m.cook_date AS 日期,
-            d.category1 AS 菜品大类,
-            d.category2 AS 细化分类,
-            COUNT(d.id) AS 分类数量
-        FROM 
-            algorithm_test_plan_item m
-        INNER JOIN 
-            algorithm_test_dish d
-        ON 
-            m.dish_id = d.id
-        WHERE
-            m.plan_id = {PLAN_ID}
-        GROUP BY 
-            m.cook_date, d.category1, d.category2
-        ORDER BY 
-            日期, 菜品大类, 细化分类;"""
-        detailed_data = pd.read_sql(detailed_query, connection)
-
-        # 确保日期列是 datetime 类型
-        detailed_data["日期"] = pd.to_datetime(detailed_data["日期"], errors="coerce")
-
-        # 按日期和菜品大类分组，并汇总细化分类
-        detailed_summary = (
-            detailed_data.groupby(["日期", "菜品大类"])
-            .apply(
-                lambda x: "，".join(
-                    f"{row['细化分类']}({row['分类数量']})" for _, row in x.iterrows()
-                )
+            # Sheet2数据
+            sheet2_data = pd.merge(
+                category_summary[["日期", "分类占比汇总"]],
+                cook_summary,
+                on="日期",
+                how="left",
             )
-            .reset_index(name="细化分类汇总")
-        )
 
-        # 确保日期列只显示年月日
-        detailed_summary["日期"] = detailed_summary["日期"].dt.strftime("%Y-%m-%d")
+            # 细化分类
+            detailed_data = pd.read_sql(get_detailed_category_query(plan_id), conn)
+            detailed_data["日期"] = pd.to_datetime(detailed_data["日期"], errors="coerce")
 
-        # 保存细化分类汇总到单独的 Sheet
-        sheet3_data = detailed_summary
+            detailed_summary = (
+                detailed_data.groupby(["日期", "菜品大类"])
+                .apply(
+                    lambda x: "，".join(
+                        f"{row['细化分类']}({row['分类数量']})" for _, row in x.iterrows()
+                    )
+                )
+                .reset_index(name="细化分类汇总")
+            )
+            detailed_summary["日期"] = detailed_summary["日期"].dt.strftime("%Y-%m-%d")
 
-        # 导出到 Excel 文件的多个 Sheet
-        with pd.ExcelWriter(output_all) as writer:
+            # Sheet3数据
+            sheet3_data = detailed_summary
+
+        # 导出到Excel
+        with pd.ExcelWriter(output_file) as writer:
             sheet1_data.to_excel(writer, sheet_name="菜品重复率与连续排餐", index=False)
             sheet2_data.to_excel(writer, sheet_name="分类比例与制作方式", index=False)
             sheet3_data.to_excel(writer, sheet_name="细化分类汇总", index=False)
 
-        print(f"所有结果已成功导出到 {output_all}")
+        logger.info(f"所有结果已成功导出到 {output_file}")
 
-    except KeyError as e:
-        print(f"关键列缺失: {e}")
     except Exception as e:
-        print(f"发生错误: {e}")
-
-    finally:
-        # 确保关闭数据库连接
-        if "connection" in locals() and connection.open:
-            connection.close()
-            print("数据库连接已关闭。")
+        logger.error(f"发生错误: {e}")
 
 
-def fetch_data_and_export7():
+def fetch_data_and_export7() -> None:
     """
-    使用 query1 查询每日大类中的热门菜数量（仅统计热门菜为“是”的数量），并按日期进行汇总显示，导出文件
+    每日热门菜统计
+
+    输出文件: output7.xlsx
     """
+    output_file = get_output_path("output7.xlsx")
+
     try:
-        # 连接数据库
-        connection = pymysql.connect(**db_config)
-        print("数据库连接成功！")
-
-        # 执行查询
-        data = pd.read_sql(query1, connection)
-
-        # 确保日期列存在并转换为 datetime 类型
-        if "日期" in data.columns:
+        with get_db_connection() as conn:
+            data = pd.read_sql(get_query1(), conn)
             data["日期"] = pd.to_datetime(data["日期"])
-        else:
-            raise KeyError("数据中未找到 '日期' 列，请检查查询结果。")
 
-        # 筛选热门菜为“是”的数据
-        hot_dish_data = data[data["热门菜"] == "是"]
+        hot_summary = calculate_hot_dish_summary(data)
+        hot_summary["日期"] = pd.to_datetime(hot_summary["日期"]).dt.strftime("%Y-%m-%d")
 
-        # 按日期和大类统计热门菜数量
-        hot_dish_summary = (
-            hot_dish_data.groupby(["日期", "大类"])
-            .size()
-            .reset_index(name="热门菜数量")
-        )
-
-        # 格式化热门菜数量为字符串
-        hot_dish_summary["热门菜统计"] = hot_dish_summary.apply(
-            lambda row: f"{row['大类']}（{int(row['热门菜数量'])}）", axis=1
-        )
-
-        # 按日期汇总热门菜统计
-        hot_summary = (
-            hot_dish_summary.groupby("日期")["热门菜统计"]
-            .apply(lambda x: "，".join(x))
-            .reset_index(name="每日热门菜统计")
-        )
-
-        # 确保日期只显示年月日
-        hot_summary["日期"] = hot_summary["日期"].dt.strftime("%Y-%m-%d")
-
-        # 导出为 Excel 文件
-        hot_summary.to_excel(output_file7, index=False)
-        print(f"数据已成功导出到 {output_file7}")
+        hot_summary.to_excel(output_file, index=False)
+        logger.info(f"数据已成功导出到 {output_file}")
 
     except Exception as e:
-        print(f"发生错误: {e}")
-
-    finally:
-        # 确保关闭数据库连接
-        if "connection" in locals() and connection.open:
-            connection.close()
-            print("数据库连接已关闭。")
+        logger.error(f"发生错误: {e}")
 
 
-def export_popular_rate_dish_count():
+def export_popular_rate_dish_count() -> None:
     """
-    导出popular_rate不为0的菜品在排餐计划中的排餐次数
+    导出popular_rate不为0的菜品的排餐次数
+
+    输出文件: popular_rate_dish_count.xlsx
     """
+    output_file = get_output_path("popular_rate_dish_count.xlsx")
+
     try:
-        connection = pymysql.connect(**db_config)
-        print("数据库连接成功！")
+        with get_db_connection() as conn:
+            data = pd.read_sql(get_popular_rate_query(), conn)
 
-        # 查询popular_rate不为0的菜品及其排餐次数
-        query = f"""
-        SELECT
-            d.dish_name AS 菜名,
-            d.popular_rate AS 热门度,
-            COUNT(m.id) AS 排餐次数
-        FROM
-            algorithm_test_dish d
-        INNER JOIN
-            algorithm_test_plan_item m ON d.id = m.dish_id
-        WHERE
-            d.popular_rate != 0
-            AND m.plan_id = {PLAN_ID}
-        GROUP BY
-            d.dish_name, d.popular_rate
-        ORDER BY
-            d.popular_rate DESC, 排餐次数 DESC
-        """
-        data = pd.read_sql(query, connection)
-
-        # 导出为 Excel 文件
-        output_file = (
-            r"d:\tangzk\py\seldom-web-testing\reports\popular_rate_dish_count.xlsx"
-        )
         data.to_excel(output_file, index=False)
-        print(f"数据已成功导出到 {output_file}")
+        logger.info(f"数据已成功导出到 {output_file}")
 
     except Exception as e:
-        print(f"发生错误: {e}")
-
-    finally:
-        if "connection" in locals() and connection.open:
-            connection.close()
-            print("数据库连接已关闭。")
+        logger.error(f"发生错误: {e}")
 
 
+# ==================== 主程序 ====================
 if __name__ == "__main__":
     # fetch_data_and_export2()
     fetch_data_and_export3()
