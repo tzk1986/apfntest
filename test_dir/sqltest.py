@@ -1,5 +1,9 @@
 import pymysql
 import pandas as pd
+'''
+用来连接数据库查找智能菜谱生成后的数据，生成对应的菜品数据execl，方便比对是否与设置一致
+
+'''
 
 # 数据库连接配置
 db_config = {
