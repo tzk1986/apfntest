@@ -66,6 +66,18 @@ def render_sidebar(config_manager):
     else:
         config_data = config_manager.get_default_config()
 
+    # 检测配置变化，同步 session_state
+    if "_last_loaded_config" not in st.session_state:
+        st.session_state._last_loaded_config = None
+    if st.session_state._last_loaded_config != selected_config:
+        st.session_state._last_loaded_config = selected_config
+        db_cfg = config_data.get("db", {})
+        st.session_state.db_host = db_cfg.get("host", "10.50.11.77")
+        st.session_state.db_port = int(db_cfg.get("port", 3306))
+        st.session_state.db_user = db_cfg.get("user", "root")
+        st.session_state.db_password = db_cfg.get("password", "")
+        st.session_state.db_database = db_cfg.get("database", "ifood_kitchen")
+
     # 保存/删除按钮
     col1, col2 = st.sidebar.columns(2)
     with col1:
@@ -93,23 +105,54 @@ def render_sidebar(config_manager):
         format="%d",
     )
 
-    # 数据库配置
+    # 数据库配置（使用 session_state 追踪输入值，确保修改后立即可用）
     with st.sidebar.expander("数据库配置", expanded=False):
-        db_config = config_data.get("db", {})
+        db_host = st.text_input(
+            "主机",
+            key="db_host",
+            value=st.session_state.get("db_host", "10.50.11.77"),
+        )
+        db_port = st.number_input(
+            "端口",
+            key="db_port",
+            value=int(st.session_state.get("db_port", 3306)),
+            step=1,
+        )
+        db_user = st.text_input(
+            "用户名",
+            key="db_user",
+            value=st.session_state.get("db_user", "root"),
+        )
+        db_password = st.text_input(
+            "密码",
+            key="db_password",
+            value=st.session_state.get("db_password", ""),
+            type="password",
+        )
+        db_database = st.text_input(
+            "数据库",
+            key="db_database",
+            value=st.session_state.get("db_database", "ifood_kitchen"),
+        )
+
+        # 从 session_state 读取最新值（用户修改后立即可用）
         config_data["db"] = {
-            "host": st.text_input("主机", value=db_config.get("host", "10.50.11.77")),
-            "port": st.number_input("端口", value=db_config.get("port", 3306), step=1),
-            "user": st.text_input("用户名", value=db_config.get("user", "root")),
-            "password": st.text_input(
-                "密码",
-                value=db_config.get("password", ""),
-                type="password",
-            ),
-            "database": st.text_input(
-                "数据库",
-                value=db_config.get("database", "ifood_kitchen"),
-            ),
+            "host": st.session_state.db_host,
+            "port": st.session_state.db_port,
+            "user": st.session_state.db_user,
+            "password": st.session_state.db_password,
+            "database": st.session_state.db_database,
         }
+
+        # 测试数据库连接按钮
+        if st.button("🔌 测试连接", use_container_width=True):
+            test_db_connection(
+                st.session_state.db_host,
+                st.session_state.db_port,
+                st.session_state.db_user,
+                st.session_state.db_password,
+                st.session_state.db_database,
+            )
 
     # 消费配置
     with st.sidebar.expander("消费配置", expanded=True):
@@ -395,6 +438,36 @@ def set_sqltest_config(config_data: dict, config_manager):
     config = config_manager.config_to_sqltest_config(config_data)
     sqltest.config = config
     return sqltest
+
+
+def test_db_connection(host: str, port: int, user: str, password: str, database: str):
+    """
+    测试数据库连接
+
+    Args:
+        host: 数据库主机
+        port: 数据库端口
+        user: 用户名
+        password: 密码
+        database: 数据库名
+    """
+    import pymysql
+
+    try:
+        conn = pymysql.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database,
+            connect_timeout=5,
+        )
+        conn.close()
+        st.success("✅ 数据库连接成功！")
+    except pymysql.err.OperationalError as e:
+        st.error(f"❌ 数据库连接失败: {e}")
+    except Exception as e:
+        st.error(f"❌ 连接错误: {e}")
 
 
 def add_log(message: str, level: str = "INFO"):
