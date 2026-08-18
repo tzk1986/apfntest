@@ -1,0 +1,53 @@
+{
+    "name": "默认配置",
+    "description": "标准排餐参数配置（对应测试参数示例）",
+    "plan_id": 25080403,
+    "db": {
+        "host": "10.50.11.77",
+        "port": 3306,
+        "user": "root",
+        "password": "!@#$%^@2021@epfly",
+        "database": "ifood_kitchen"
+    },
+    "consumption": {
+        "std_weight": 350.0,
+        "weight_tolerance": 0.02,
+        "std_price": 24.0,
+        "price_tolerance": 0.04
+    },
+    "category": {
+        "weight_ratio": {
+            "大荤": 50,
+            "小荤": 30,
+            "素菜": 20
+        },
+        "dish_count": {
+            "大荤": 8,
+            "小荤": 7,
+            "素菜": 4
+        },
+        "hot_dish_count": {
+            "大荤": 2,
+            "小荤": 2,
+            "素菜": 1
+        },
+        "ratio_tolerance": 5.0
+    },
+    "cook_method": {
+        "ratio": {
+            "炒菜机": 8,
+            "蒸烤箱": 6,
+            "人工": 5
+        },
+        "tolerance": 2.0
+    },
+    "limits": {
+        "non_hot_repeat_max_ratio": 20.0,
+        "min_dish_weight": 50.0,
+        "min_interval_days": 1
+    },
+    "output": {
+        "dir": "d:\\tangzk\\py\\seldom-web-testing\\reports",
+        "enable_timestamp": true
+    }
+}
