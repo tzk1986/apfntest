@@ -107,33 +107,23 @@ def render_sidebar(config_manager):
 
     # 数据库配置（使用 session_state 追踪输入值，确保修改后立即可用）
     with st.sidebar.expander("数据库配置", expanded=False):
-        db_host = st.text_input(
-            "主机",
-            key="db_host",
-            value=st.session_state.get("db_host", "10.50.11.77"),
-        )
-        db_port = st.number_input(
-            "端口",
-            key="db_port",
-            value=int(st.session_state.get("db_port", 3306)),
-            step=1,
-        )
-        db_user = st.text_input(
-            "用户名",
-            key="db_user",
-            value=st.session_state.get("db_user", "root"),
-        )
-        db_password = st.text_input(
-            "密码",
-            key="db_password",
-            value=st.session_state.get("db_password", ""),
-            type="password",
-        )
-        db_database = st.text_input(
-            "数据库",
-            key="db_database",
-            value=st.session_state.get("db_database", "ifood_kitchen"),
-        )
+        # 初始化 session_state（如果不存在）
+        if "db_host" not in st.session_state:
+            st.session_state.db_host = config_data["db"].get("host", "10.50.11.77")
+        if "db_port" not in st.session_state:
+            st.session_state.db_port = int(config_data["db"].get("port", 3306))
+        if "db_user" not in st.session_state:
+            st.session_state.db_user = config_data["db"].get("user", "root")
+        if "db_password" not in st.session_state:
+            st.session_state.db_password = config_data["db"].get("password", "")
+        if "db_database" not in st.session_state:
+            st.session_state.db_database = config_data["db"].get("database", "ifood_kitchen")
+
+        db_host = st.text_input("主机", key="db_host")
+        db_port = st.number_input("端口", key="db_port", step=1)
+        db_user = st.text_input("用户名", key="db_user")
+        db_password = st.text_input("密码", key="db_password", type="password")
+        db_database = st.text_input("数据库", key="db_database")
 
         # 从 session_state 读取最新值（用户修改后立即可用）
         config_data["db"] = {
